@@ -16,14 +16,14 @@ con.connect(function(err) {
 });
 
 app.get("/", function(req,res){
-   res.send('Hello World');
+   res.send('Sign-up');
 
    machine.machineId().then((id) => {
       var sql = "SELECT * FROM device WHERE device_id = 'id.toString()'";
       con.query(sql, function (err, result) {
        if (err) throw err;
        if(result.length == 0){
-         console.log("New device");
+         //Redirect to signup page
          }
      });
    })
@@ -35,8 +35,8 @@ app.post('/', function (req, res) {
 })
 
 app.post('/verifyPassword', function (req,res){
-   var uname = req.get('Uname').toString();
-   var pass = req.get('Password').toString();
+   var username = req.get('username').toString();
+   var password = req.get('password').toString();
 
 })
 
