@@ -11,6 +11,7 @@ import {
   LogoutPage,
   HomePage,
   ResetPasswordPage,
+  SignupPage,
 } from './views';
 
 const App = () => (
@@ -20,6 +21,7 @@ const App = () => (
       <Router>
         <Switch>
           <Route exact path={RoutePaths.HOME} component={HomePage} />
+          <Route exact path={RoutePaths.SIGN_UP} component={SignupPage} />
           <Route exact path={RoutePaths.LOGIN} component={LoginPage} />
           <Route exact path={RoutePaths.FORGOT_PASSWORD} component={ForgotPasswordPage} />
           <Route exact path={RoutePaths.RESET_PASSWORD} component={ResetPasswordPage} />
