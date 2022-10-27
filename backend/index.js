@@ -57,6 +57,14 @@ app.post("/", function(req,res){
    res.status(400).send('Not available');
 })
 
+app.post('/display_users', function(req, res){
+   var sql = "SELECT uID,username FROM user_profile"
+   con.query(sql,function(err,result){
+      if(err) throw err;
+      res.status(200).send(result);
+   })
+})
+
 app.post('/signup', function(req,res){
    if (req.cookies) {
       var sessionT = req.cookies['session_token']
@@ -130,7 +138,7 @@ app.post('/login', function (req,res){
 })
 
 app.post('/closet', function(req,res){
-   if (!req.cookies) {
+   /*if (!req.cookies) {
        res.status(401).send('Invalid Session')
       return
    }
@@ -157,7 +165,7 @@ app.post('/closet', function(req,res){
        delete sessions[sessionToken]
        res.status(401).end('Session expired')
        return
-    }
+    }*/
 
     res.status(200).send('Closet')
 })
@@ -168,20 +176,19 @@ app.post('/closet', function(req,res){
 */
 io.on('connection', function(socket){
    console.log('A user connected');
-   socket.on('setUsername', function(data){
+   /*socket.on('setUsername', function(data){
       if(users.indexOf(data) > -1){
          users.push(data);
          socket.emit('userSet', {username: data});
       } else {
          socket.emit('userExists', data + ' username is taken! Try some other username.');
      }
-   })
+   })*/
 });
 
-var server = app.listen(8000, function () {
+var server = http.listen(8000, function () {
    var host = server.address().address
    var port = server.address().port
    console.log("server online")
    console.log(server.address());
 })
-
