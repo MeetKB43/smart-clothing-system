@@ -13,13 +13,14 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import AddNewProfile from './AddNewProfile';
+import AddNewProfile from '../../views/AddProfile';
+import AddClothForm from '../add-clothes/AddClothForm';
 
 const drawerWidth = 240;
 
 export default function StaticDrawer() {
   const [state, setState] = React.useState();
-  console.log(state);
+
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
       <CssBaseline />
@@ -61,9 +62,9 @@ export default function StaticDrawer() {
         </List>
       </Drawer>
       <>
-        {state === 'Add new Profile' ? <AddNewProfile style={{ align: 'center' }} /> : null}
+        {state === 'Add new Profile' ? <AddNewProfile /> : null}
         {state === 'Suggestions' ? <h1 key={state}>Hello Suggestions</h1> : null}
-        {state === 'Add New Clothes' ? <h1 key={state}>Hello Add New Clothes</h1> : null}
+        {state === 'Add New Clothes' ? <AddClothForm /> : null}
         <></>
       </>
     </Box>
