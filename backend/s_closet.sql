@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1:3306
--- Generation Time: Oct 27, 2022 at 04:13 PM
+-- Generation Time: Oct 27, 2022 at 09:30 PM
 -- Server version: 5.7.36
 -- PHP Version: 7.4.26
 
@@ -20,6 +20,34 @@ SET time_zone = "+00:00";
 --
 -- Database: `s_closet`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `cloths`
+--
+
+DROP TABLE IF EXISTS `cloths`;
+CREATE TABLE IF NOT EXISTS `cloths` (
+  `RFID` bigint(11) NOT NULL,
+  `uID` int(11) NOT NULL,
+  `cType` enum('0','1','2','3','4','5','6') NOT NULL,
+  PRIMARY KEY (`RFID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `inventory`
+--
+
+DROP TABLE IF EXISTS `inventory`;
+CREATE TABLE IF NOT EXISTS `inventory` (
+  `RFID` bigint(20) NOT NULL,
+  `uID` int(11) NOT NULL,
+  `laundryState` enum('0','1') NOT NULL,
+  PRIMARY KEY (`RFID`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
 -- --------------------------------------------------------
 
@@ -46,7 +74,8 @@ CREATE TABLE IF NOT EXISTS `user_profile` (
 --
 
 INSERT INTO `user_profile` (`uID`, `username`, `firstname`, `lastname`, `pin`, `gender`, `age`, `city`) VALUES
-(5857563, 'meet', 'Meet', 'Kevadiya', 123456, 'male', 22, 'Windsor');
+(5857563, 'meet', 'Meet', 'Kevadiya', 123456, 'male', 22, 'Windsor'),
+(3600902, 'arjun', 'Arjun', 'Kheni', 123456, 'male', 22, 'Windsor');
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
