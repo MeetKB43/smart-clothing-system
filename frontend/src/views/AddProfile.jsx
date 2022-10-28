@@ -11,6 +11,7 @@ import { MenuItem } from '@mui/material';
 import PublicWrapper from '../components/layouts/Public';
 import Validations from '../utils';
 import useToastr from '../hooks/useToastr';
+import { addProfile } from '../api/Profile';
 
 const AddProfile = () => {
   const { control, handleSubmit } = useForm();
@@ -18,10 +19,21 @@ const AddProfile = () => {
 
   const [processing, setProcessing] = useState(false);
 
-  const onSubmit = async () => {
+  const onSubmit = async (data) => {
     setProcessing(true);
     try {
       // TODO: Add add profile service
+
+      const toSubmitData = {
+        username: data.firstName + data.lastName,
+        firstname: data.firstName,
+        lastname: data.lastName,
+        pin: data.pin,
+        age: data.age,
+        gender: data.gender,
+        city: data.city,
+      };
+      await addProfile(toSubmitData);
       showSuccessToastr('Added profile successfully.');
       setProcessing(false);
     } catch (error) {
