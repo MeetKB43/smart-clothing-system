@@ -1,12 +1,17 @@
 import React from 'react';
+import Proptypes from 'prop-types';
+import { Box } from '@mui/material';
 
-import { Box, Button } from '@mui/material';
-
-const FinalStep = () => (
+const FinalStep = ({ processing }) => (
   <Box display="flex" sx={{ my: 4 }} flexDirection="column">
-    Your Cloth has been added into the system successfully. Please generete RFID tag.
-    <Button sx={{ mt: 4 }}>Get RFID</Button>
+    {processing
+      ? 'Scanned cloth successfuly. Please wait while we add it into our system'
+      : 'Your Cloth has been added into the system successfully.'}
   </Box>
 );
+
+FinalStep.propTypes = {
+  processing: Proptypes.bool.isRequired,
+};
 
 export default FinalStep;
