@@ -86,26 +86,8 @@ function validate_session(req){
     return true
 }
 
-async function Check_pkt_type(RFID){
-   sql = "SELECT * FROM cloths WHERE RFID = ?"
-   con.query(sql,RFID,function(err,result){
-      if (err) {throw err}
-      if(result.length>0){
-         sql = "SELECT * FROM inventory WHERE RFID = ?"
-         con.query(sql,RFID,function(err,result){
-            if(result.length>0){
-               if (err) {throw err}
-               sql = "DELETE FROM inventory WHERE RFID = ?"
-               con.query(sql, RFID, function(err,result){
-                  if(err) {throw err}
-                  return(2);
-               })
-            }
-            return(1);
-         })
-      }
-      return(0);
-   })
+function Check_pkt_type(RFID){
+   
 }
 
 app.post('/signup', function(req,res){
@@ -200,10 +182,35 @@ app.post('/cloth_scanned',function(req,res){
       return
    }*/
    var RFID = req.body['RFID'];
-   var pkt_type = await Check_pkt_type(RFID);
-   io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
-   res.status(200).send("RFID read");
-   
+   var pkt_type;
+   sql = "SELECT * FROM cloths WHERE RFID = ?"
+   con.query(sql,RFID,function(err,result){
+      if (err) {throw err}
+      if(result.length>0){
+         sql = "SELECT * FROM inventory WHERE RFID = ?"
+         con.query(sql,RFID,function(err,result){
+            if(result.length>0){
+               if (err) {throw err}
+               sql = "DELETE FROM inventory WHERE RFID = ?"
+               con.query(sql, RFID,function(err,result){
+                  if(err) {throw err}
+                  pkt_type = 2;
+                  io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+               })
+            }
+            else{
+               pkt_type = 1;
+               io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+            }
+         })
+      }
+      else{
+         pkt_type = 0;
+         io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+      }
+      
+      res.status(200).send("RFID read");
+   })
 })
 
 app.post('/add_cloths',function(req,res){
@@ -241,9 +248,8 @@ app.post('/display_users', function(req, res){
 
 io.on('connection', function(socket){
    
-   socket_devices[deviceID] = socket.id;
-   io.on('connected',function(deviceID){
-      console.log("Device connected, ID:" + deviceID)
+   socket.on('connected',function(deviceID1){
+      deviceID = deviceID1
       socket_devices[deviceID] = socket.id;
    })
 });
