@@ -53,19 +53,40 @@ class Session {
 var sessions = {}
 var socket_user= []
 
-app.post("/", function(req,res){
-   res.status(400).send('Not available');
-})
+function validate_session(req){
+   if (!req.cookies) {
+      //res.status(401).send('Invalid Session')
+      return false
+   }
+
+    // We can obtain the session token from the requests cookies, which come with every request
+    const sessionToken = req.cookies['session_token']
+    if (!sessionToken) {
+        // If the cookie is not set, return an unauthorized status
+        return false
+     }
+
+    // We then get the session of the user from our session map
+    userSession = sessions[sessionToken]
+    if (!userSession) {
+        // If the session token is not present in session map, return an unauthorized error
+        return false
+     }
+    // if the session has expired, return an unauthorized error, and delete the 
+    // session from our map
+    if (userSession.isExpired()) {
+       delete sessions[sessionToken]
+       return false
+    }
+
+    return true
+}
+
 
 app.post('/signup', function(req,res){
-   if (req.cookies) {
-      var sessionT = req.cookies['session_token']
-      if(sessions[sessionT]){
-         if(!sessions[sessionT].isExpired()){
-            res.redirect(307,'/closet');
-            return;
-         }
-      }
+   if (!validate_session(req)) {
+      res.status(200).send("Invalid Session");
+      return;
    }
 
    var body = req.body;
@@ -73,7 +94,7 @@ app.post('/signup', function(req,res){
    var username = body['username'];
    var firstname = body['firstname'];
    var lastname = body['lastname'];
-   var pin = body['pin'];
+   //var pin = body['pin'];
    var age = body['age'];
    var gender = body['gender'];
    var city = body['city'];
@@ -97,14 +118,9 @@ app.post('/signup', function(req,res){
 
 
 app.post('/login', function (req,res){  
-   if (req.cookies) {
-      var sessionT = req.cookies['session_token']
-      if(sessions[sessionT]){
-         if(!sessions[sessionT].isExpired()){
-            res.redirect(307,'/closet');
-            return;
-         }
-      }
+   if (validate_session(req)) {
+      res.status(200).send('Session is already running for this device');
+      return;
    }
    
    var username = req.body['username'];
@@ -129,59 +145,97 @@ app.post('/login', function (req,res){
    })  
 })
 
-app.post('/closet', function(req,res){
-   if (!req.cookies) {
-       res.status(401).send('Invalid Session')
+app.post('/add_new_cloth', function(req,res){
+   if(!validate_session(req)){
+      res.status(401).send('Invalid Session')
       return
    }
 
-    // We can obtain the session token from the requests cookies, which come with every request
-    const sessionToken = req.cookies['session_token']
-    if (!sessionToken) {
-        // If the cookie is not set, return an unauthorized status
-        res.status(401).send('Invalid Session')
-        return
-     }
+   var RFID = req.body['RFID']
+   var uID = req.body['uID'];   
+   var cType = req.body['cType'];
 
-    // We then get the session of the user from our session map
-    // that we set in the signinHandler
-    userSession = sessions[sessionToken]
-    if (!userSession) {
-        // If the session token is not present in session map, return an unauthorized error
-        res.status(401).send('Invalid Session')
-        return
-     }
-    // if the session has expired, return an unauthorized error, and delete the 
-    // session from our map
-    if (userSession.isExpired()) {
-       delete sessions[sessionToken]
-       res.status(401).end('Session expired')
-       return
-    }
+   sql = "INSERT INTO cloths VALUES (?,?,?)"
+   con.query(sql,[RFID,uID,cType],function(err,result){
+      if (err) {throw err}
+   })
 
-    res.status(200).send('Closet')
+   sql = "INSERT INTO inventory VALUES (?,?,?)"
+   con.query(sql,[RFID,uID,"0"],function(err,result){
+      if (err) {throw err}
+   })
+
+   res.status(200).send("Collect and stick RFID on cloth");
+   //Print RFID tag
+   
 })
 
-/*io.set("authorization", function(data, accept) {
-   console.log(data.headers.cookies);
-});
-*/
+app.post('/cloth_scanned',function(req,res){
+   if(!validate_session(req)){
+      res.status(401).send('Invalid Session')
+      return
+   }
+
+   var RFID = req.body['RFID'];
+   sql = "SELECT * FROM inventory WHERE RFID = ?"
+   con.query(sql,RFID,function(err,result){
+      if (err) {throw err}
+      if(result.length>0){
+         sql = "DELETE FROM inventory WHERE RFID = ?"
+         con.query(sql, RFID, function(err,result){
+            if(err) {throw err}
+         })
+         res.status(200).send("Cloth removed from Inventory")
+      }
+      else{
+         io.sockets.emit('RFID scanned',['Cloth Scanned',RFID])
+         res.status(200).send("display cloth");
+      }
+   })
+})
+
+app.post('/add_cloths',function(req,res){
+   if(!validate_session(req)){
+      res.status(401).send('Invalid Session')
+      return 
+   }
+
+   var data = [];
+   var body = req.body;
+
+   for(var i=0;i<body['RFID'].length;i++){
+      data.push([body['RFID'][i],body['uID'][i],body['laundryState'][i]])
+   }
+
+   sql = "INSERT INTO inventory VALUES ?"
+   con.query(sql,[data],function(err,result){
+      if(err) {throw err}
+   })
+   res.status(200).send("Cloths added into inventory");
+})
+
+app.post('/display_users', function(req, res){
+   if(!validate_session(req)){
+      res.status(401).send('Invalid Session')
+      return;
+   }
+   var sql = "SELECT uID,username FROM user_profile"
+   con.query(sql,function(err,result){
+      if(err) throw err;
+      res.status(200).send(result);
+   })
+})
+
 io.on('connection', function(socket){
    console.log('A user connected');
-   socket.on('setUsername', function(data){
-      if(users.indexOf(data) > -1){
-         users.push(data);
-         socket.emit('userSet', {username: data});
-      } else {
-         socket.emit('userExists', data + ' username is taken! Try some other username.');
-     }
-   })
+   socket.on('RFID scanned', function (data) {
+      console.log(data);
+   });
 });
 
-var server = app.listen(8000, function () {
+var server = http.listen(8000, function () {
    var host = server.address().address
    var port = server.address().port
    console.log("server online")
    console.log(server.address());
 })
-
