@@ -15,8 +15,8 @@ var cors = require("cors");
 
 var con = mysql.createConnection({
  host: "localhost",
- user: "S_Closet",
- password: "Team4@closet",
+ user: "root",
+ password: "",
  database: "s_closet"
 });
 
@@ -28,8 +28,14 @@ con.connect(function(err) {
 // for parsing cookies
 app.use(cookieParser());
 
-app.use(cors());
-
+const corsOptions = {
+   origin: true,
+   methods: ['GET', 'POST', 'DELETE'],
+   credentials: true,
+ };
+ app.use(cors(corsOptions));
+ app.options('*', cors());
+ 
 // for parsing application/json
 app.use(bodyParser.json()); 
 
@@ -86,8 +92,26 @@ function validate_session(req){
     return true
 }
 
-function Check_pkt_type(RFID){
-   
+async function Check_pkt_type(RFID){
+   sql = "SELECT * FROM cloths WHERE RFID = ?"
+   con.query(sql,[RFID],function(err,result){
+      if (err) {throw err}
+      if(result.length>0){
+         sql = "SELECT * FROM inventory WHERE RFID = ?"
+         con.query(sql,RFID,function(err,result){
+            if(result.length>0){
+               if (err) {throw err}
+               sql = "DELETE FROM inventory WHERE RFID = ?"
+               con.query(sql, [RFID], function(err,result){
+                  if(err) {throw err}
+                  return(2);
+               })
+            }
+            return(1);
+         })
+      }
+      return(0);
+   })
 }
 
 app.post('/signup', function(req,res){
@@ -95,6 +119,7 @@ app.post('/signup', function(req,res){
       res.status(200).send("Invalid Session");
       return;
    }*/
+   console.log('signup')
 
    var body = req.body;
    var uID = parseInt(Math.random()*10000000)
@@ -116,6 +141,8 @@ app.post('/signup', function(req,res){
       else{
          sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
          con.query(sql, data, function (err, result) {
+            console.log(err);
+
             if (err) throw err;
             res.status(200).send("A new user linked with this device");
          });
@@ -158,6 +185,7 @@ app.post('/add_new_cloth', function(req,res){
       return
    }*/
 
+
    var RFID = req.body['RFID'];
    var uID = req.body['uID'];
    var cType = req.body['cType'];
@@ -176,41 +204,16 @@ app.post('/add_new_cloth', function(req,res){
    //Print RFID tag
 })
 
-app.post('/cloth_scanned',function(req,res){
+app.post('/cloth_scanned',async function(req,res){
    /*if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return
    }*/
    var RFID = req.body['RFID'];
-   var pkt_type;
-   sql = "SELECT * FROM cloths WHERE RFID = ?"
-   con.query(sql,RFID,function(err,result){
-      if (err) {throw err}
-      if(result.length>0){
-         sql = "SELECT * FROM inventory WHERE RFID = ?"
-         con.query(sql,RFID,function(err,result){
-            if(result.length>0){
-               if (err) {throw err}
-               sql = "DELETE FROM inventory WHERE RFID = ?"
-               con.query(sql, RFID,function(err,result){
-                  if(err) {throw err}
-                  pkt_type = 2;
-                  io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
-               })
-            }
-            else{
-               pkt_type = 1;
-               io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
-            }
-         })
-      }
-      else{
-         pkt_type = 0;
-         io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
-      }
-      
-      res.status(200).send("RFID read");
-   })
+   var pkt_type = await Check_pkt_type(RFID);
+   io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+   res.status(200).send("RFID read");
+   
 })
 
 app.post('/add_cloths',function(req,res){
@@ -248,8 +251,9 @@ app.post('/display_users', function(req, res){
 
 io.on('connection', function(socket){
    
-   socket.on('connected',function(deviceID1){
-      deviceID = deviceID1
+   socket_devices[deviceID] = socket.id;
+   io.on('connected',function(deviceID){
+      console.log("Device connected, ID:" + deviceID)
       socket_devices[deviceID] = socket.id;
    })
 });

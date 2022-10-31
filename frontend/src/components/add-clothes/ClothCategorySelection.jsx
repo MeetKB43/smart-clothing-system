@@ -10,14 +10,16 @@ import Proptypes from 'prop-types';
 const ClothCategorySelection = ({ setActiveStep }) => {
   // eslint-disable-next-line no-unused-vars
   const [clothCategory, setClothCategory] = useState([
-    { name: 'Category 1' },
-    { name: 'Category 2' },
-    { name: 'Category 3' },
-    { name: 'Category 4' },
-    { name: 'Category 5' },
-    { name: 'Category 6' },
-    { name: 'Category 7' },
-    { name: 'Category 8' },
+    { name: 'Casual Shirt', id: 1 },
+    { name: 'Formal Shirt', id: 2 },
+    { name: 'Jacket', id: 3 },
+    { name: 'SweatShirt', id: 4 },
+    { name: 'Suits', id: 5 },
+    { name: 'Coats', id: 6 },
+    { name: 'Jeans', id: 7 },
+    { name: 'Formal Trouser', id: 8 },
+    { name: 'Shorts', id: 9 },
+    { name: 'Track pants', id: 10 },
   ]);
 
   return (

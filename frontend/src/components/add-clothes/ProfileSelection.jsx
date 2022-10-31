@@ -16,7 +16,6 @@ const ProfileSelection = ({ setActiveStep }) => {
   const { showErrorToastr } = useToastr();
 
   const [processing, setProcessing] = useState(false);
-
   useEffect(() => {
     setProcessing(true);
     displayProfiles()

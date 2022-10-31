@@ -35,9 +35,9 @@ const AddClothForm = () => {
 
   const labels = ['Select Profile', 'Select Cloth Category', 'Attach RFID', 'Done'];
 
-  const addClothToSystem = () => {
+  const addClothToSystem = (data) => {
     setProcessing(true);
-    addNewCloth()
+    addNewCloth(data)
       .then(() => {
         setActiveStep(3);
         setProcessing(false);
@@ -54,6 +54,7 @@ const AddClothForm = () => {
     const socket = socketIOClient(ENDPOINT);
     socket.on('connect', () => {
       // connected
+      console.log('Connection esta');
     });
 
     socket.on('disconnect', () => {
@@ -61,8 +62,9 @@ const AddClothForm = () => {
     });
 
     socket.on('RFID scanned', async (d) => {
+      console.log('Packet received');
       if (d[0] === 'Cloth Scanned') {
-        await addClothToSystem();
+        await addClothToSystem({ RFID: d[2], uID: 123, cType: 1 });
       }
     });
 

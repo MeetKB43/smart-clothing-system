@@ -25,7 +25,7 @@ const AddProfile = () => {
       // TODO: Add add profile service
 
       const toSubmitData = {
-        username: data.firstName + data.lastName,
+        username: `${data.firstName} ${data.lastName}`,
         firstname: data.firstName,
         lastname: data.lastName,
         pin: data.pin,

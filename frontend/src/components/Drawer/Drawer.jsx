@@ -15,11 +15,12 @@ import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import AddNewProfile from '../../views/AddProfile';
 import AddClothForm from '../add-clothes/AddClothForm';
+import Inventory from '../../views/InventoryPage/Inventory';
 
 const drawerWidth = 240;
 
 export default function StaticDrawer() {
-  const [state, setState] = React.useState();
+  const [state, setState] = React.useState('Add new Profile');
 
   return (
     <Box sx={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
@@ -30,7 +31,7 @@ export default function StaticDrawer() {
       >
         <Toolbar>
           <Typography variant="h6" noWrap component="div">
-            Permanent drawer
+            Smart Clothing System
           </Typography>
         </Toolbar>
       </AppBar>
@@ -62,6 +63,7 @@ export default function StaticDrawer() {
         </List>
       </Drawer>
       <>
+        {state === 'Inventory Management' ? <Inventory /> : null}
         {state === 'Add new Profile' ? <AddNewProfile /> : null}
         {state === 'Suggestions' ? <h1 key={state}>Hello Suggestions</h1> : null}
         {state === 'Add New Clothes' ? <AddClothForm /> : null}
