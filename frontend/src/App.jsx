@@ -13,22 +13,25 @@ import {
   ResetPasswordPage,
   SignupPage,
 } from './views';
+import { ToastrProvider } from './contexts/ToastrContext';
 
 const App = () => (
   <StyledEngineProvider injectFirst>
     <ThemeProvider theme={DefaultAppTheme}>
       <CssBaseline />
-      <Router>
-        <Switch>
-          <Route exact path={RoutePaths.HOME} component={HomePage} />
-          <Route exact path={RoutePaths.SIGN_UP} component={SignupPage} />
-          <Route exact path={RoutePaths.LOGIN} component={LoginPage} />
-          <Route exact path={RoutePaths.FORGOT_PASSWORD} component={ForgotPasswordPage} />
-          <Route exact path={RoutePaths.RESET_PASSWORD} component={ResetPasswordPage} />
-          <Route exact path={RoutePaths.LOGOUT} component={LogoutPage} />
-          <Route component={NotFoundPage} />
-        </Switch>
-      </Router>
+      <ToastrProvider>
+        <Router>
+          <Switch>
+            <Route exact path={RoutePaths.HOME} component={HomePage} />
+            <Route exact path={RoutePaths.SIGN_UP} component={SignupPage} />
+            <Route exact path={RoutePaths.LOGIN} component={LoginPage} />
+            <Route exact path={RoutePaths.FORGOT_PASSWORD} component={ForgotPasswordPage} />
+            <Route exact path={RoutePaths.RESET_PASSWORD} component={ResetPasswordPage} />
+            <Route exact path={RoutePaths.LOGOUT} component={LogoutPage} />
+            <Route component={NotFoundPage} />
+          </Switch>
+        </Router>
+      </ToastrProvider>
     </ThemeProvider>
   </StyledEngineProvider>
 );
