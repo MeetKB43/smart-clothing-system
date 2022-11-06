@@ -20,6 +20,14 @@ var con = mysql.createConnection({
  database: "s_closet"
 });
 
+class Scanned_Cloth {
+   constructor(msg, pkt_Type, RFID){
+      this.pkt_Type = pkt_Type
+      this.msg = msg
+      this.RFID = RFID
+   }
+}
+
 con.connect(function(err) {
  if (err) throw err;
  console.log("Database connected!");
@@ -55,7 +63,6 @@ class Session {
 
 var sessions = {}
 var socket_devices= []
-var deviceID = 1
 
 function validate_session(req){
    if (!req.cookies) {
@@ -86,54 +93,35 @@ function validate_session(req){
     return true
 }
 
-function Check_pkt_type(RFID){
-   
-}
 
-app.post('/signup', function(req,res){
-   /*if (!validate_session(req)) {
-      res.status(200).send("Invalid Session");
-      return;
-   }*/
-
-   var body = req.body;
-   var uID = parseInt(Math.random()*10000000)
-   var username = body['username'];
-   var firstname = body['firstname'];
-   var lastname = body['lastname'];
-   var pin = "123456";
-   var age = body['age'];
-   var gender = body['gender'];
-   var city = body['city'];
-   var data = [uID, username, firstname, lastname, pin, gender, age, city];
-
-   sql = "SELECT * FROM user_profile WHERE username = ?"
-   con.query(sql, username, function(err,result){
-      if (err) throw err;
-      if(result.length > 0){
-         res.status(403).send("User already exist");
-      }
-      else{
-         sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
-         con.query(sql, data, function (err, result) {
-            if (err) throw err;
-            res.status(200).send("A new user linked with this device");
-         });
-      }
+app.post('/register_device', function(req, res){
+   var deviceID = req.body['deviceID'];
+   var devicename = req.body['devicename'];
+   var pin = req.body['pin'];
+   var data = [deviceID, devicename, pin]
+   var sql = "SELECT * from super_user WHERE deviceID = ?"
+   con.query(sql, deviceID, function(err, result){
+      if(err) throw err;
+      if(result.length>0):
+         res.status(403).send("This device is already linked with system");
    });
+   var sql = "INSERT INTO super_user VALUES (?,?,?)"
+   con.query(sql, data, function(err, result){
+      if(err) throw err;
+      res.status(200).send("A new device linked with system");
+   })
 })
 
-
 app.post('/login', function (req,res){  
-   /*if (validate_session(req)) {
+   if (validate_session(req)) {
       res.status(200).send('Session is already running for this device');
       return;
-   }*/
+   }
    
-   var username = req.body['username'];
+   var deviceID = req.body['deviceID'];
    var pin = req.body['pin'];
-   var sql = "SELECT * FROM user_profile WHERE username = ?"
-   con.query(sql, username, function (err, result) {
+   var sql = "SELECT * FROM super_user WHERE deviceID = ?"
+   con.query(sql, deviceID, function (err, result) {
       if (err) throw err;
       if(result.length != 0){
          if(result[0]['pin'] == pin){
@@ -152,11 +140,43 @@ app.post('/login', function (req,res){
    })  
 })
 
+app.post('/register_user', function(req,res){
+   if (!validate_session(req)) {
+      res.status(200).send("Invalid Session");
+      return;
+   }
+
+   var body = req.body;
+   var deviceID = body['deviceID'];
+   var username = body['username'];
+   var firstname = body['firstname'];
+   var lastname = body['lastname'];
+   var age = body['age'];
+   var gender = body['gender'];
+   var city = body['city'];
+   var data = [null, deviceID, username, firstname, lastname, gender, age, city];
+
+   sql = "SELECT * FROM user_profile WHERE username = ?"
+   con.query(sql, username, function(err,result){
+      if (err) throw err;
+      if(result.length > 0){
+         res.status(403).send("User already exist");
+      }
+      else{
+         sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
+         con.query(sql, data, function (err, result) {
+            if (err) throw err;
+            res.status(200).send("A new user linked with this device");
+         });
+      }
+   });
+})
+
 app.post('/add_new_cloth', function(req,res){
-   /*if(!validate_session(req)){
+   if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return
-   }*/
+   }
 
    var RFID = req.body['RFID'];
    var uID = req.body['uID'];
@@ -173,14 +193,13 @@ app.post('/add_new_cloth', function(req,res){
    })
 
    res.status(200).send("Collect and stick RFID on cloth");
-   //Print RFID tag
 })
 
 app.post('/cloth_scanned',function(req,res){
-   /*if(!validate_session(req)){
+   if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return
-   }*/
+   }
    var RFID = req.body['RFID'];
    var pkt_type;
    sql = "SELECT * FROM cloths WHERE RFID = ?"
@@ -194,19 +213,20 @@ app.post('/cloth_scanned',function(req,res){
                sql = "DELETE FROM inventory WHERE RFID = ?"
                con.query(sql, RFID,function(err,result){
                   if(err) {throw err}
+                  c1 = Scanned_Cloth("take_cloth", 2, RFID);
                   pkt_type = 2;
-                  io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+                  io.to(socket_devices[deviceID]).emit('RFID scanned',c1) //0: new cloth, 1: put cloth, 2: take cloth
                })
             }
             else{
-               pkt_type = 1;
-               io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+               c1 = Scanned_Cloth("put_cloth", 1, RFID);
+               io.to(socket_devices[deviceID]).emit('RFID scanned',c1) //0: new cloth, 1: put cloth, 2: take cloth
             }
          })
       }
       else{
-         pkt_type = 0;
-         io.to(socket_devices[deviceID]).emit('RFID scanned',['Cloth Scanned', pkt_type, RFID]) //0: new cloth, 1: put cloth, 2: take cloth
+         c1 = Scanned_Cloth("new_Cloth", 0, RFID);
+         io.to(socket_devices[deviceID]).emit('RFID scanned',c1) //0: new cloth, 1: put cloth, 2: take cloth
       }
       
       res.status(200).send("RFID read");
@@ -214,10 +234,10 @@ app.post('/cloth_scanned',function(req,res){
 })
 
 app.post('/add_cloths',function(req,res){
-   /*if(!validate_session(req)){
+   if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return 
-   }*/
+   }
 
    var data = [];
    var body = req.body;
@@ -234,10 +254,10 @@ app.post('/add_cloths',function(req,res){
 })
 
 app.post('/display_users', function(req, res){
-   /*if(!validate_session(req)){
+   if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return;
-   }*/
+   }
 
    var sql = "SELECT uID,username FROM user_profile"
    con.query(sql,function(err,result){
@@ -246,8 +266,8 @@ app.post('/display_users', function(req, res){
    })
 })
 
-io.on('connection', function(socket){
-   
+
+io.on('connection', function(socket){  
    socket.on('connected',function(deviceID1){
       deviceID = deviceID1
       socket_devices[deviceID] = socket.id;
@@ -260,3 +280,10 @@ var server = http.listen(8000, function () {
    console.log("server online")
    console.log(server.address());
 })
+
+//dashboard
+/*Inventory
+washed
+unwashed
+formal
+casual*/
