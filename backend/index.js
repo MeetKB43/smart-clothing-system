@@ -15,8 +15,8 @@ var cors = require("cors");
 
 var con = mysql.createConnection({
  host: "localhost",
- user: "S_Closet",
- password: "Team4@closet",
+ user: "root",
+ password: "",
  database: "s_closet"
 });
 
@@ -36,8 +36,14 @@ con.connect(function(err) {
 // for parsing cookies
 app.use(cookieParser());
 
-app.use(cors());
-
+const corsOptions = {
+   origin: true,
+   methods: ['GET', 'POST', 'DELETE'],
+   credentials: true,
+ };
+ app.use(cors(corsOptions));
+ app.options('*', cors());
+ 
 // for parsing application/json
 app.use(bodyParser.json()); 
 
@@ -94,6 +100,7 @@ function validate_session(req){
 }
 
 
+
 app.post('/register_device', function(req, res){
    var deviceID = req.body['deviceID'];
    var devicename = req.body['devicename'];
@@ -140,6 +147,7 @@ app.post('/login', function (req,res){
    })  
 })
 
+
 app.post('/register_user', function(req,res){
    if (!validate_session(req)) {
       res.status(200).send("Invalid Session");
@@ -165,6 +173,8 @@ app.post('/register_user', function(req,res){
       else{
          sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
          con.query(sql, data, function (err, result) {
+            console.log(err);
+
             if (err) throw err;
             res.status(200).send("A new user linked with this device");
          });
@@ -177,6 +187,7 @@ app.post('/add_new_cloth', function(req,res){
       res.status(401).send('Invalid Session')
       return
    }
+
 
    var RFID = req.body['RFID'];
    var uID = req.body['uID'];
@@ -194,6 +205,7 @@ app.post('/add_new_cloth', function(req,res){
 
    res.status(200).send("Collect and stick RFID on cloth");
 })
+
 
 app.post('/cloth_scanned',function(req,res){
    if(!validate_session(req)){
@@ -231,6 +243,7 @@ app.post('/cloth_scanned',function(req,res){
       
       res.status(200).send("RFID read");
    })
+
 })
 
 app.post('/add_cloths',function(req,res){
@@ -267,9 +280,10 @@ app.post('/display_users', function(req, res){
 })
 
 
+
 io.on('connection', function(socket){  
    socket.on('connected',function(deviceID1){
-      deviceID = deviceID1
+      deviceID = deviceID1;
       socket_devices[deviceID] = socket.id;
    })
 });
