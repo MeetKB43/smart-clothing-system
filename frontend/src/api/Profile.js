@@ -2,7 +2,7 @@ import { postApiCall } from '../utils/Api';
 
 /* eslint-disable import/prefer-default-export */
 export const addProfile = async (payload) => {
-  const result = await postApiCall('/signup', payload);
+  const result = await postApiCall('/register_user', payload);
   return result.data;
 };
 
