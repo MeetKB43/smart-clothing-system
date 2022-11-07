@@ -11,13 +11,17 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var cors = require("cors");
+const dotenv = require('dotenv');
+
+// Initialize environment config
+dotenv.config();
 
 
 var con = mysql.createConnection({
- host: "localhost",
- user: "root",
- password: "",
- database: "s_closet"
+ host: process.env.DB_HOST,
+ user: process.env.DB_USER,
+ password: process.env.DB_PASS,
+ database: process.env.DB_DATABASE,
 });
 
 class Scanned_Cloth {
@@ -109,7 +113,7 @@ app.post('/register_device', function(req, res){
    var sql = "SELECT * from super_user WHERE deviceID = ?"
    con.query(sql, deviceID, function(err, result){
       if(err) throw err;
-      if(result.length>0):
+      if(result.length>0)
          res.status(403).send("This device is already linked with system");
    });
    var sql = "INSERT INTO super_user VALUES (?,?,?)"
@@ -288,7 +292,8 @@ io.on('connection', function(socket){
    })
 });
 
-var server = http.listen(8000, function () {
+let appPort = process.env.PORT || 8000;
+var server = http.listen(appPort, function () {
    var host = server.address().address
    var port = server.address().port
    console.log("server online")
