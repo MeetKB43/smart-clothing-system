@@ -19,6 +19,7 @@
     "mysql": "^2.18.1",
     "node-machine-id": "^1.1.12",
     "socket.io": "^4.5.3",
+    "util": "^0.12.5",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
