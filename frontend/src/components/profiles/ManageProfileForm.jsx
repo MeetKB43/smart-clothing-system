@@ -213,6 +213,7 @@ const ManageProfileForm = ({ editId, closeDialog }) => {
           form="manage-profile"
           variant="contained"
           type="submit"
+          color="primary"
           endIcon={processing && <CircularProgress color="secondary" size={18} />}
           disabled={processing}
         >
