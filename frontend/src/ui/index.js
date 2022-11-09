@@ -1,3 +1,9 @@
-import DefaultAppTheme from './Theme';
+import { extend } from 'colord';
+import mixPlugin from 'colord/plugins/mix';
+import lchPlugin from 'colord/plugins/lch';
+import a11yPlugin from 'colord/plugins/a11y';
 
-export default DefaultAppTheme;
+extend([mixPlugin, lchPlugin, a11yPlugin]);
+
+export * from './Theme';
+export { default } from './Theme';

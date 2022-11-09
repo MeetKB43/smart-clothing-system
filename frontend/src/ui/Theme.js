@@ -1,45 +1,40 @@
 import { createTheme } from '@mui/material/styles';
-import palette from './Palette';
-import typography from './Fonts';
+import { merge } from 'lodash-es';
 
-// Extend default MuiTheme
-const Default = createTheme({
-  palette,
-  typography,
-  components: {
-    MuiFormHelperText: {
-      contained: {
-        marginLeft: 0,
-        marginRight: 0,
-      },
-    },
-    MuiButton: {
-      root: {
-        boxShadow: 'none',
-        '&:hover': {
-          boxShadow: 'none',
-        },
-        '&:focus': {
-          boxShadow: 'none',
-        },
-      },
-      contained: {
-        boxShadow: 'none',
-        '&:hover': {
-          boxShadow: 'none',
-        },
-        '&:focus': {
-          boxShadow: 'none',
-        },
-      },
-    },
-    MuiTableSortLabel: {
-      icon: {
-        opacity: 1,
-        color: 'rgba(0, 0, 0, 0.54)',
-      },
-    },
-  },
-});
+import { colorsLight, colorsDark } from './Colors';
+import components from './Components';
+import { typography } from './Fonts';
 
-export default Default;
+export const customizableLightTheme = (customization) => {
+  const customizedLightThemeBase = createTheme(
+    merge(
+      {},
+      typography(customization?.typography ?? {}),
+      colorsLight(customization?.palette?.primary?.main)
+    )
+  );
+
+  return createTheme(
+    merge({}, customizedLightThemeBase, components(customizedLightThemeBase), customization)
+  );
+};
+
+export const customizableDarkTheme = (customization) => {
+  const customizedDarkThemeBase = createTheme(
+    merge(
+      {},
+      typography(customization?.typography ?? {}),
+      colorsDark(customization?.palette?.primary?.main, customization?.palette?.darker)
+    )
+  );
+
+  return createTheme(
+    merge({}, customizedDarkThemeBase, components(customizedDarkThemeBase), customization)
+  );
+};
+
+const themes = {
+  light: customizableLightTheme,
+  dark: customizableDarkTheme,
+};
+export default themes;

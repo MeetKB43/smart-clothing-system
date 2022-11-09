@@ -4,8 +4,8 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
-import { PublicWrapper } from '../../components';
-import RoutePaths from '../../configs/Routes';
+import { PublicWrapper } from '../../components/layouts';
+import { RoutePaths } from '../../configs';
 
 // Logout page
 const Logout = () => {
@@ -14,7 +14,8 @@ const Logout = () => {
   useEffect(() => {
     // TODO: Add logout service
     setTimeout(() => {
-      history.push(RoutePaths.LOGIN);
+      // history.push(RoutePaths.LOGIN);  TODO: remove this once the auth flow is implemented
+      history.push(RoutePaths.HOME);
     }, 1000);
   }, []);
 

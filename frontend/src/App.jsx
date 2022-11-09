@@ -1,9 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider, StyledEngineProvider } from '@mui/material/styles';
-import DefaultAppTheme from './ui';
-import RoutePaths from './configs';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { RoutePaths } from './configs';
 import {
   LoginPage,
   ForgotPasswordPage,
@@ -12,12 +11,17 @@ import {
   HomePage,
   ResetPasswordPage,
   SignupPage,
+  InventoryPage,
+  ProfilesPage,
+  SuggestionsPage,
 } from './views';
 import { ToastrProvider } from './contexts/ToastrContext';
+import './assets/styles/fonts.css';
+import AppThemeProvider from './contexts/ThemeContext';
 
 const App = () => (
   <StyledEngineProvider injectFirst>
-    <ThemeProvider theme={DefaultAppTheme}>
+    <AppThemeProvider>
       <CssBaseline />
       <ToastrProvider>
         <Router>
@@ -28,11 +32,14 @@ const App = () => (
             <Route exact path={RoutePaths.FORGOT_PASSWORD} component={ForgotPasswordPage} />
             <Route exact path={RoutePaths.RESET_PASSWORD} component={ResetPasswordPage} />
             <Route exact path={RoutePaths.LOGOUT} component={LogoutPage} />
+            <Route exact path={RoutePaths.INVENTORY} component={InventoryPage} />
+            <Route exact path={RoutePaths.SUGGESTIONS} component={SuggestionsPage} />
+            <Route exact path={RoutePaths.PROFILES} component={ProfilesPage} />
             <Route component={NotFoundPage} />
           </Switch>
         </Router>
       </ToastrProvider>
-    </ThemeProvider>
+    </AppThemeProvider>
   </StyledEngineProvider>
 );
 

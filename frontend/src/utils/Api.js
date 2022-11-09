@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-catch */
 import axios from 'axios';
-import RoutePaths from '../configs/Routes';
+import { RoutePaths } from '../configs';
 import { getCurrentTimestamp } from './Datetime';
 
 export const postApiCall = async (endpoint, data) => {
