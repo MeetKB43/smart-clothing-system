@@ -5,6 +5,9 @@ import ResetPasswordPage from './auth/ResetPassword';
 import NotFoundPage from './NotFound';
 import HomePage from './Home';
 import SignupPage from './auth/Signup';
+import InventoryPage from './Inventory';
+import ProfilesPage from './Profiles';
+import SuggestionsPage from './Suggestions';
 
 export {
   LoginPage,
@@ -14,4 +17,7 @@ export {
   HomePage,
   ResetPasswordPage,
   SignupPage,
+  InventoryPage,
+  ProfilesPage,
+  SuggestionsPage,
 };

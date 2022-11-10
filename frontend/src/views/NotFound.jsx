@@ -5,8 +5,8 @@ import Button from '@mui/material/Button';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import { useHistory } from 'react-router-dom';
-import { ErrorWrapper } from '../components';
-import RoutePaths from '../configs';
+import { ErrorWrapper } from '../components/layouts';
+import { RoutePaths } from '../configs';
 
 // 404 Page
 const NotFound = () => {

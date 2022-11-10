@@ -1,101 +1,150 @@
-// ----------------------------------------------------------------------
+export const BODY_FONT = 'Inter, system-ui, sans-serif';
+export const HEADING_FONT = `Space Grotesk, ${BODY_FONT}`;
+export const MONO_FONT = 'JetBrains Mono, ui-monospace, monospace';
 
-function pxToRem(value) {
-  return `${value / 16}rem`;
-}
+export const ROOT_FONT_SIZE = 16;
+export const toRem = (px) => `${px / ROOT_FONT_SIZE}rem`;
+export const toEm = (px, root) => `${px / root}em`;
 
-function responsiveFontSizes({ sm, md, lg }) {
+export const typography = ({
+  fontFamily: customizedFontFamily,
+  fontFamilyMono: customizedFontFamilyMono,
+  fontFamilyHeading: customizedFontFamilyHeading,
+
+  fontWeightLight = 300,
+  fontWeightRegular = 400,
+  fontWeightMedium = 500,
+  fontWeightBold = 600,
+}) => {
+  const fontFamily = [customizedFontFamily, BODY_FONT].filter((x) => x).join(', ');
+  const fontFamilyMono = [customizedFontFamilyMono, MONO_FONT].filter((x) => x).join(', ');
+  const fontFamilyHeading = [customizedFontFamilyHeading, HEADING_FONT].filter((x) => x).join(', ');
+
+  const fontStyleBody = {
+    fontFamily,
+    fontFeatureSettings:
+      fontFamily !== BODY_FONT ? 'normal' : `"calt", "ss01", "ss03", "cv05", "cv08", "cv09"`,
+    WebkitFontSmoothing: 'auto',
+    MozOsxFontSmoothing: 'auto',
+  };
+  const fontStyleHeading = {
+    fontFamily: fontFamilyHeading,
+    fontFeatureSettings: fontFamilyHeading !== HEADING_FONT ? 'normal' : `"ss02", "ss03"`,
+    WebkitFontSmoothing: 'antialiased',
+    MozOsxFontSmoothing: 'grayscale',
+  };
+
   return {
-    '@media (min-width:600px)': {
-      fontSize: pxToRem(sm),
+    typography: {
+      fontFamily,
+      fontFamilyMono,
+      fontFamilyHeading,
+
+      fontWeightLight,
+      fontWeightRegular,
+      fontWeightMedium,
+      fontWeightBold,
+
+      h1: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(96),
+        letterSpacing: toEm(-1.5, 96),
+        lineHeight: 112 / 96,
+      },
+      h2: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(60),
+        letterSpacing: toEm(-0.75, 60),
+        lineHeight: 72 / 60,
+      },
+      h3: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(48),
+        letterSpacing: toEm(-0.5, 48),
+        lineHeight: 60 / 48,
+      },
+      h4: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(34),
+        letterSpacing: toEm(-0.35, 34),
+        lineHeight: 44 / 34,
+      },
+      h5: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(24),
+        letterSpacing: '0',
+        // letterSpacing: toEm(-0.2, 24),
+        lineHeight: 32 / 24,
+      },
+      h6: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(20),
+        letterSpacing: '0',
+        // letterSpacing: toEm(-0.15, 20),
+        lineHeight: 28 / 20,
+      },
+      subtitle1: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(17),
+        letterSpacing: toEm(0.2, 16),
+        lineHeight: 24 / 17,
+      },
+      subtitle2: {
+        ...fontStyleHeading,
+        fontWeight: fontWeightBold,
+        fontSize: toRem(15),
+        letterSpacing: toEm(0.25, 14),
+        lineHeight: 20 / 15,
+      },
+      body1: {
+        ...fontStyleBody,
+        fontSize: toRem(16),
+        letterSpacing: toEm(0.5, 16),
+        lineHeight: 24 / 16,
+      },
+      body2: {
+        ...fontStyleBody,
+        fontSize: toRem(14),
+        letterSpacing: toEm(0.25, 14),
+        lineHeight: 20 / 14,
+      },
+      button: {
+        ...fontStyleBody,
+        fontWeight: fontWeightMedium,
+        fontSize: toRem(14),
+        letterSpacing: toEm(0.25, 14),
+        lineHeight: 20 / 14,
+        textTransform: 'none',
+      },
+      caption: {
+        ...fontStyleBody,
+        fontSize: toRem(12),
+        letterSpacing: toEm(0.4, 12),
+        lineHeight: 20 / 12,
+      },
+      overline: {
+        ...fontStyleBody,
+        fontSize: toRem(12),
+        letterSpacing: toEm(1.5, 12),
+        lineHeight: 20 / 12,
+      },
     },
-    '@media (min-width:900px)': {
-      fontSize: pxToRem(md),
-    },
-    '@media (min-width:1200px)': {
-      fontSize: pxToRem(lg),
+    components: {
+      MuiTypography: {
+        defaultProps: { variant: 'body2' },
+      },
+      MuiLink: {
+        styleOverrides: {
+          root: { textUnderlineOffset: toRem(1) },
+        },
+      },
     },
   };
-}
-
-const FONT_PRIMARY = 'Public Sans, sans-serif';
-
-const typography = {
-  fontFamily: FONT_PRIMARY,
-  fontWeightRegular: 400,
-  fontWeightMedium: 600,
-  fontWeightBold: 700,
-  h1: {
-    fontWeight: 700,
-    lineHeight: 80 / 64,
-    fontSize: pxToRem(40),
-    ...responsiveFontSizes({ sm: 52, md: 58, lg: 64 }),
-  },
-  h2: {
-    fontWeight: 700,
-    lineHeight: 64 / 48,
-    fontSize: pxToRem(32),
-    ...responsiveFontSizes({ sm: 40, md: 44, lg: 48 }),
-  },
-  h3: {
-    fontWeight: 700,
-    lineHeight: 1.5,
-    fontSize: pxToRem(24),
-    ...responsiveFontSizes({ sm: 26, md: 30, lg: 32 }),
-  },
-  h4: {
-    fontWeight: 700,
-    lineHeight: 1.5,
-    fontSize: pxToRem(20),
-    ...responsiveFontSizes({ sm: 20, md: 24, lg: 24 }),
-  },
-  h5: {
-    fontWeight: 700,
-    lineHeight: 1.5,
-    fontSize: pxToRem(18),
-    ...responsiveFontSizes({ sm: 19, md: 20, lg: 20 }),
-  },
-  h6: {
-    fontWeight: 700,
-    lineHeight: 28 / 18,
-    fontSize: pxToRem(17),
-    ...responsiveFontSizes({ sm: 18, md: 18, lg: 18 }),
-  },
-  subtitle1: {
-    fontWeight: 600,
-    lineHeight: 1.5,
-    fontSize: pxToRem(16),
-  },
-  subtitle2: {
-    fontWeight: 600,
-    lineHeight: 22 / 14,
-    fontSize: pxToRem(14),
-  },
-  body1: {
-    lineHeight: 1.5,
-    fontSize: pxToRem(16),
-  },
-  body2: {
-    lineHeight: 22 / 14,
-    fontSize: pxToRem(14),
-  },
-  caption: {
-    lineHeight: 1.5,
-    fontSize: pxToRem(12),
-  },
-  overline: {
-    fontWeight: 700,
-    lineHeight: 1.5,
-    fontSize: pxToRem(12),
-    letterSpacing: 1.1,
-    textTransform: 'uppercase',
-  },
-  button: {
-    fontWeight: 700,
-    lineHeight: 24 / 14,
-    fontSize: pxToRem(14),
-    textTransform: 'capitalize',
-  },
 };
-
-export default typography;
