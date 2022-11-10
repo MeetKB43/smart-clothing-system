@@ -8,7 +8,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContentText from '@mui/material/DialogContentText';
 
-const ConfirmDialog = ({ title, message, onClose, confirmBtnText, onConfirm, processing }) => (
+const ConfirmDialog = ({ title, message, onClose, confirmBtnText, onApprove, processing }) => (
   <Dialog open>
     <DialogTitle>{title}</DialogTitle>
     <DialogContent>
@@ -16,7 +16,7 @@ const ConfirmDialog = ({ title, message, onClose, confirmBtnText, onConfirm, pro
     </DialogContent>
     <DialogActions>
       <Button
-        onClick={onConfirm}
+        onClick={onApprove}
         autoFocus
         endIcon={processing && <CircularProgress size={25} />}
         disabled={processing}
@@ -38,7 +38,7 @@ ConfirmDialog.propTypes = {
   title: PropTypes.string.isRequired,
   message: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
-  onConfirm: PropTypes.func.isRequired,
+  onApprove: PropTypes.func.isRequired,
   confirmBtnText: PropTypes.string,
   processing: PropTypes.bool,
 };

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
@@ -9,9 +9,10 @@ import Box from '@mui/material/Box';
 import CircularProgress from '@mui/material/CircularProgress';
 import { Controller, useForm } from 'react-hook-form';
 import { Link } from '@mui/material';
+import * as uuid from 'device-uuid';
 import PublicWrapper from '../../components/layouts/Public';
 import Validations from '../../utils/Validations';
-import { loginDevice } from '../../api/Auth';
+import { loginDevice, validateSession } from '../../api/Auth';
 import useToastr from '../../hooks/useToastr';
 import RoutePaths from '../../configs/Routes';
 
@@ -25,18 +26,27 @@ const Login = () => {
   const onSubmit = async (data) => {
     setProcessing(true);
     try {
-      const result = await loginDevice(data);
-      if (result.success) {
-        showSuccessToastr('Logged in successfully.');
-        window.localStorage.setItem('isLoggedIn', true);
-        window.location.assign(RoutePaths.HOME);
-      }
+      const toSubmitData = {
+        deviceID: new uuid.DeviceUUID().get(),
+        pin: data.pin,
+      };
+      await loginDevice(toSubmitData);
+      showSuccessToastr('Logged in successfully.');
+      window.localStorage.setItem('isLoggedIn', true);
+      window.location.assign(RoutePaths.HOME);
       setProcessing(false);
-    } catch (error) {
-      showErrorToastr(error?.message || 'Something went wrong.');
+    } catch ({ response }) {
+      showErrorToastr(response?.data || 'Something went wrong.');
       setProcessing(false);
     }
   };
+
+  useEffect(() => {
+    validateSession().then(() => {
+      window.localStorage.setItem('isLoggedIn', true);
+      window.location.assign(RoutePaths.HOME);
+    });
+  }, []);
 
   return (
     <PublicWrapper>
@@ -53,36 +63,15 @@ const Login = () => {
                 <Grid item xs={12}>
                   <Controller
                     control={control}
-                    id="deviceName"
-                    name="deviceName"
+                    id="pin"
+                    name="pin"
                     rules={{ ...Validations.REQUIRED }}
                     render={({ field: { onChange, value } }) => (
                       <TextField
                         required
-                        id="deviceName"
-                        name="deviceName"
-                        label="Device Name"
-                        fullWidth
-                        variant="standard"
-                        type="text"
-                        value={value}
-                        onChange={onChange}
-                      />
-                    )}
-                  />
-                </Grid>
-                <Grid item xs={12}>
-                  <Controller
-                    control={control}
-                    id="password"
-                    name="password"
-                    rules={{ ...Validations.REQUIRED }}
-                    render={({ field: { onChange, value } }) => (
-                      <TextField
-                        required
-                        id="password"
-                        name="password"
-                        label="Password"
+                        id="pin"
+                        name="pin"
+                        label="Pin"
                         fullWidth
                         variant="standard"
                         type="password"

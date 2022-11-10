@@ -35,6 +35,7 @@ const ManageProfileForm = ({ editId, closeDialog }) => {
       };
       await addProfile(toSubmitData);
       showSuccessToastr('Added profile successfully.');
+      closeDialog();
       setProcessing(false);
     } catch (error) {
       showErrorToastr('Error adding the profile.');

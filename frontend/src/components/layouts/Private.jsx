@@ -27,10 +27,8 @@ const PrivateWrapper = ({ pageName, children }) => {
     document.title = pageName;
   }, [history, pageName]);
 
-  useEffect(async () => {
-    let isLoggedIn = !localStorage.getItem('isLoggedIn');
-    isLoggedIn = true; // TODO: remove this once auth flow is integrated
-    if (!isLoggedIn) {
+  useEffect(() => {
+    if (!localStorage.getItem('isLoggedIn')) {
       history.push('/logout');
     }
   }, [pageName]);

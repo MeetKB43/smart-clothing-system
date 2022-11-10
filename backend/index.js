@@ -217,6 +217,19 @@ app.post('/delete_user',function(req,res){
    
 })
 
+app.get('/validate-session',function(req,res){
+   if (!validate_session(req)) {
+      res.status(400).send({success:false,message:'Invalid Session'});
+   }else{
+      res.status(200).send({success:true,message:'Valid Session'});
+   }
+})
+
+app.get('/logout',function(req,res){
+   res.cookie("session_token", '', { maxAge: 0 });
+   res.json({ success: true });
+})
+
 //app.post('/')
 
 

@@ -77,29 +77,3 @@ export const deleteApiCall = async (endpoint) => {
     throw e;
   }
 };
-
-export const exportApiCall = async (endpoint) => {
-  const options = {
-    url: `${process.env.REACT_APP_API_ENDPOINT}${endpoint}`,
-    method: 'GET',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      'Auth-Token': getCurrentTimestamp(),
-      'Access-Control-Allow-Origin': '*',
-    },
-    responseType: 'blob',
-    withCredentials: true,
-    data: {},
-  };
-
-  try {
-    const response = await axios(options);
-    return response;
-  } catch (e) {
-    if (e.response.status === 401) {
-      window.location.assign(RoutePaths.HOME);
-    }
-    throw e;
-  }
-};

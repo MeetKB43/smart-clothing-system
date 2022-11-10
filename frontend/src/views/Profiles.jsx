@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import TextField from '@mui/material/TextField';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,6 +11,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { Pagination, IconButton } from '@mui/material';
+import * as uuid from 'device-uuid';
 import { deleteProfile, getProfilesList } from '../api/Profile';
 import { PrivateWrapper } from '../components/layouts';
 import TableListing from '../ui/styles/views/TableListing';
@@ -20,6 +20,8 @@ import ManageProfileForm from '../components/profiles/ManageProfileForm';
 import useToastr from '../hooks/useToastr';
 
 const useStyles = makeStyles(TableListing);
+
+const DEVICE_ID = new uuid.DeviceUUID().get();
 
 const Profiles = () => {
   const pageName = 'Profiles';
@@ -31,7 +33,6 @@ const Profiles = () => {
   const [reloadRows, setReloadRows] = useState(false);
   const [activePage, setActivePage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
-  const [searchText, setSearchText] = useState('');
 
   const [selectedProfile, setSelectedProfile] = useState(0);
   const [showProfileForm, setShowProfileForm] = useState(false);
@@ -42,16 +43,9 @@ const Profiles = () => {
     { name: 'Clothes', id: 'totalClothes', width: '40%', align: 'right' },
   ];
 
-  const constructQuery = () => {
-    let q = '1=1';
-    if (searchText) q += `&searchText=${searchText}`;
-
-    return q.substring(4);
-  };
-
   useEffect(() => {
     setDataLoaded(false);
-    getProfilesList(activePage, constructQuery())
+    getProfilesList({ deviceID: DEVICE_ID })
       .then((data) => {
         setRows(data.map((d) => ({ ...d, name: d.username, totalClothes: 10 }))); // TODO: delete static data later
         setTotalPages(1);
@@ -64,10 +58,10 @@ const Profiles = () => {
       });
   }, [reloadRows, activePage]);
 
-  const searchList = () => {
-    setActivePage(1);
-    setReloadRows(!reloadRows);
-  };
+  // const searchList = () => {
+  //   setActivePage(1);
+  //   setReloadRows(!reloadRows);
+  // };
 
   const deleteRecord = () => {
     deleteProfile(selectedProfile)
@@ -88,7 +82,7 @@ const Profiles = () => {
       <>
         <div className={classes.filterToolbar}>
           <div className={classes.filterLeft}>
-            <TextField
+            {/* <TextField
               name="search"
               id="search"
               label="Search"
@@ -105,7 +99,7 @@ const Profiles = () => {
               onClick={() => setReloadRows(!reloadRows)}
             >
               Refresh
-            </Button>
+            </Button> */}
           </div>
           <div className={classes.filterRight}>
             <Button
@@ -119,7 +113,7 @@ const Profiles = () => {
             </Button>
           </div>
         </div>
-        <TableContainer>
+        <TableContainer sx={{ mt: 2 }}>
           <Table className={classes.tableData} aria-label="simple table">
             <TableHead>
               <TableRow>
@@ -156,7 +150,7 @@ const Profiles = () => {
                         className={classes.deleteBtn}
                         onClick={() => {
                           setShowConfirmDeleteDialog(true);
-                          setSelectedProfile(row.id);
+                          setSelectedProfile(row.uID);
                         }}
                       >
                         <DeleteIcon fontSize="small" color="error" />
@@ -166,7 +160,7 @@ const Profiles = () => {
                         className={classes.deleteBtn}
                         onClick={() => {
                           setShowProfileForm(true);
-                          setSelectedProfile(row.id);
+                          setSelectedProfile(row.uID);
                         }}
                       >
                         <EditIcon fontSize="small" />

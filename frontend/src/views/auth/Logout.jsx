@@ -6,17 +6,19 @@ import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
 import { PublicWrapper } from '../../components/layouts';
 import { RoutePaths } from '../../configs';
+import { logoutDevice } from '../../api/Auth';
 
 // Logout page
 const Logout = () => {
   const history = useHistory();
 
   useEffect(() => {
-    // TODO: Add logout service
-    setTimeout(() => {
-      // history.push(RoutePaths.LOGIN);  TODO: remove this once the auth flow is implemented
-      history.push(RoutePaths.HOME);
-    }, 1000);
+    logoutDevice().then(() => {
+      window.localStorage.removeItem('isLoggedIn');
+      setTimeout(() => {
+        history.push(RoutePaths.LOGIN);
+      }, 1000);
+    });
   }, []);
 
   return (
