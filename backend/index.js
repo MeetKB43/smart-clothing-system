@@ -340,9 +340,9 @@ app.post('/display_users', function(req, res){
       res.status(401).send('Invalid Session')
       return;
    }
-
-   var sql = "SELECT uID,username FROM user_profile"
-   con.query(sql,function(err,result){
+   var deviceID = req.body['deviceID'];
+   var sql = "SELECT uID,username FROM user_profile WHERE deviceID = ?"
+   con.query(sql, deviceID, function(err,result){
       if(err) throw err;
       res.status(200).send(result);
    })
