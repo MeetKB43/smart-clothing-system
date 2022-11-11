@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
@@ -7,7 +8,6 @@ import { Controller, useForm } from 'react-hook-form';
 import { Dialog, MenuItem } from '@mui/material';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import PropTypes from 'prop-types';
 import DialogActions from '@mui/material/DialogActions';
 import * as uuid from 'device-uuid';
 import useToastr from '../../hooks/useToastr';

@@ -14,11 +14,13 @@ import {
   InventoryPage,
   ProfilesPage,
   SuggestionsPage,
+  UserInventoryPage,
 } from './views';
 import { ToastrProvider } from './contexts/ToastrContext';
 import './assets/styles/fonts.css';
 import AppThemeProvider from './contexts/ThemeContext';
 import { validateSession } from './api/Auth';
+import { UserActionsProvider } from './contexts/UserActionsContext';
 
 const App = () => {
   useEffect(async () => {
@@ -39,20 +41,23 @@ const App = () => {
       <AppThemeProvider>
         <CssBaseline />
         <ToastrProvider>
-          <Router>
-            <Switch>
-              <Route exact path={RoutePaths.HOME} component={HomePage} />
-              <Route exact path={RoutePaths.SIGN_UP} component={SignupPage} />
-              <Route exact path={RoutePaths.LOGIN} component={LoginPage} />
-              <Route exact path={RoutePaths.FORGOT_PASSWORD} component={ForgotPasswordPage} />
-              <Route exact path={RoutePaths.RESET_PASSWORD} component={ResetPasswordPage} />
-              <Route exact path={RoutePaths.LOGOUT} component={LogoutPage} />
-              <Route exact path={RoutePaths.INVENTORY} component={InventoryPage} />
-              <Route exact path={RoutePaths.SUGGESTIONS} component={SuggestionsPage} />
-              <Route exact path={RoutePaths.PROFILES} component={ProfilesPage} />
-              <Route component={NotFoundPage} />
-            </Switch>
-          </Router>
+          <UserActionsProvider>
+            <Router>
+              <Switch>
+                <Route exact path={RoutePaths.HOME} component={HomePage} />
+                <Route exact path={RoutePaths.SIGN_UP} component={SignupPage} />
+                <Route exact path={RoutePaths.LOGIN} component={LoginPage} />
+                <Route exact path={RoutePaths.FORGOT_PASSWORD} component={ForgotPasswordPage} />
+                <Route exact path={RoutePaths.RESET_PASSWORD} component={ResetPasswordPage} />
+                <Route exact path={RoutePaths.LOGOUT} component={LogoutPage} />
+                <Route exact path={RoutePaths.INVENTORY} component={InventoryPage} />
+                <Route exact path={RoutePaths.SUGGESTIONS} component={SuggestionsPage} />
+                <Route exact path={RoutePaths.PROFILES} component={ProfilesPage} />
+                <Route exact path={RoutePaths.USER_INVENTORY} component={UserInventoryPage} />
+                <Route component={NotFoundPage} />
+              </Switch>
+            </Router>
+          </UserActionsProvider>
         </ToastrProvider>
       </AppThemeProvider>
     </StyledEngineProvider>

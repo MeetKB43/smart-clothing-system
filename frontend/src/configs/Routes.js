@@ -7,6 +7,7 @@ const RoutePaths = {
   FORGOT_PASSWORD: '/forgot-password',
   RESET_PASSWORD: '/reset-password',
   INVENTORY: '/inventory',
+  USER_INVENTORY: '/inventory/:uID/view',
   SUGGESTIONS: '/suggestions',
   PROFILES: '/profiles',
 };
