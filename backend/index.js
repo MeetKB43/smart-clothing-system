@@ -278,6 +278,7 @@ app.post('/add_new_cloth', function(req,res){
    var RFID = req.body['RFID'];
    var uID = req.body['uID'];
    var cType = req.body['cType'];
+   var cSubType = req.body['cSubType']
    var deviceID = req.body['deviceID']
 
    sql = "SELECT * FROM inventory WHERE RFID = ? AND deviceID = ?"
@@ -291,8 +292,8 @@ app.post('/add_new_cloth', function(req,res){
          con.query(sql, [uID,deviceID], function(err, result){
             if (err) throw err;
             if(result.length != 0){
-               sql = "INSERT INTO inventory VALUES (?,?,?,?,?,?)"
-               con.query(sql,[RFID, deviceID, uID, cType, 0, 1],function(err,result){
+               sql = "INSERT INTO inventory VALUES (?,?,?,?,?,?,?)"
+               con.query(sql,[RFID, deviceID, uID, cType, cSubType, 0, 1],function(err,result){
                   if (err) {throw err}
                })
                res.status(200).send("Scan and stick RFID on cloth");      
@@ -304,6 +305,52 @@ app.post('/add_new_cloth', function(req,res){
    })
 })
 
+app.post('/display_inventory', async function(req, res){
+   /*if(!validate_session(req)){
+      res.status(401).send('Invalid Session')
+      return 
+   }*/
+
+   var body = req.body;
+   var uID = body['uID'];
+   var deviceID = body['deviceID']
+   var page = body['page']
+   var numPerPage = body['entryPerPage'];
+   const query = util.promisify(con.query).bind(con);
+   var sql = "SELECT * FROM user_profile WHERE uID = ? AND deviceID = ?"
+   var skip = page * numPerPage;
+  // Here we compute the LIMIT parameter for MySQL query
+  var limit = skip + ',' + numPerPage;
+
+   query('SELECT count(*) as RFID FROM inventory WHERE uID = '+uID)
+  .then(function(results) {
+    numRows = results[0]['RFID'];
+    numPages = Math.ceil(numRows / numPerPage);
+  })
+  .then(() => query('SELECT * FROM inventory WHERE uID = '+uID+ ' ORDER BY RFID LIMIT ' + limit))
+  .then(function(results) {
+    var responsePayload = {
+      results: results
+    };
+    if (page < numPages) {
+      responsePayload.pagination = {
+        current: page,
+        perPage: numPerPage,
+        previous: page > 0 ? page - 1 : undefined,
+        next: page < numPages - 1 ? parseInt(page) + 1 : undefined
+      }
+    }
+    else responsePayload.pagination = {
+      err: 'queried page ' + page + ' is >= to maximum page number ' + numPages
+    }
+    res.json(responsePayload);
+  })
+  .catch(function(err) {
+    console.error(err);
+    res.json({ err: err });
+  });
+})
+
 app.post('/add_cloths',async function(req,res){
    if(!validate_session(req)){
       res.status(401).send('Invalid Session')
@@ -313,32 +360,20 @@ app.post('/add_cloths',async function(req,res){
    var data = [];
    var body = req.body;
    const query = util.promisify(con.query).bind(con);
-   if(Array.isArray(body['RFID'])){
-      for(var i=0;i<body['RFID'].length;i++){
-         if(body['laundryState'][i] == 1){
-            var result;
-            var sql = "SELECT * FROM inventory WHERE RFID = ? AND deviceID = ?"
-            try{
-               result = await query(sql, [body['RFID'][i], body['deviceID'][i]])
-            }finally{}
-            if(result.length>0){
-               data.push([body['RFID'][i],body['deviceID'][i]]);
-            }
-         }
-      }
-   }
-   else{
-      if(body['laundryState'] == 1){
+   
+   for(var i=0;i<body.length;i++){
+      if(body[i]['laundryState'] == 1){
          var result;
          var sql = "SELECT * FROM inventory WHERE RFID = ? AND deviceID = ?"
          try{
-            result = await query(sql, [body['RFID'], body['deviceID']])
+            result = await query(sql, [body[i]['RFID'], body[i]['deviceID']])
          }finally{}
          if(result.length>0){
-            data.push([body['RFID'], body['deviceID']]);
+            data.push([body[i]['RFID'],body[i]['deviceID']]);
          }
       }
    }
+   
    for(i = 0; i < data.length; i++){
       sql = "UPDATE inventory SET usedBeforeWash = 0 WHERE RFID = ? AND deviceID = ?"
       con.query(sql,data[i],function(err,result){
@@ -404,6 +439,7 @@ var server = http.listen(appPort, function () {
    console.log("server online")
    console.log(server.address());
 })
+
 
 //dashboard
 /*Inventory
