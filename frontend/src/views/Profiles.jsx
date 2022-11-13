@@ -67,7 +67,7 @@ const Profiles = () => {
     deleteProfile(selectedProfile)
       .then(() => {
         setShowConfirmDeleteDialog(false);
-        showSuccessToastr('Profile delted successfully.');
+        showSuccessToastr('Profile deleted successfully.');
         setReloadRows(!reloadRows);
       })
       .catch((error) => {
@@ -99,7 +99,8 @@ const Profiles = () => {
               onClick={() => setReloadRows(!reloadRows)}
             >
               Refresh
-            </Button> */}
+            </Button> 
+            */}
           </div>
           <div className={classes.filterRight}>
             <Button

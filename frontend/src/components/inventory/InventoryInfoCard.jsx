@@ -1,18 +1,11 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Proptypes from 'prop-types';
-import { Card, CardActionArea, Divider, CardContent, Typography, Button } from '@mui/material';
+import { Card, Divider, CardContent, Typography, Button } from '@mui/material';
 import ListItemText from '@mui/material/ListItemText';
 import Box from '@mui/material/Box';
 
-const InventoryInfoCard = ({
-  heading,
-  topHeaderText,
-  totalClothes,
-  washedClothes,
-  unwashedClothes,
-  link,
-}) => {
+const InventoryInfoCard = ({ heading, totalClothes, washedClothes, unwashedClothes, link }) => {
   const history = useHistory();
 
   return (
@@ -22,17 +15,11 @@ const InventoryInfoCard = ({
       component={Button}
       style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
     >
-      <CardActionArea>
-        <CardContent style={{ paddingBottom: 0 }}>
-          <Typography variant="overline" component="p">
-            {topHeaderText}
-          </Typography>
-          <Typography variant="h6" component="h3" gutterBottom>
-            {heading}
-          </Typography>
-        </CardContent>
-      </CardActionArea>
-
+      <CardContent style={{ paddingBottom: 0 }}>
+        <Typography variant="h6" component="h3" gutterBottom>
+          {heading.split(' ')[0] ? heading.split(' ')[0] : heading}
+        </Typography>
+      </CardContent>
       <CardContent style={{ flexGrow: 1, p: 0, m: 0 }}>
         <Box display="flex">
           <Box sx={{ mr: 3 }}>
@@ -40,12 +27,12 @@ const InventoryInfoCard = ({
               sx={{ p: 0, m: 0 }}
               primary={
                 <Typography sx={{ p: 0, m: 0, fontSize: 18 }} variant="h6" component="div">
-                  Washed Clothes
+                  Total Clothes
                 </Typography>
               }
               secondary={
                 <Typography sx={{ p: 0, m: 0, fontSize: 16 }} variant="body" component="div">
-                  {washedClothes}
+                  {totalClothes}
                 </Typography>
               }
             />
@@ -97,7 +84,6 @@ const InventoryInfoCard = ({
 
 InventoryInfoCard.propTypes = {
   heading: Proptypes.string.isRequired,
-  topHeaderText: Proptypes.string.isRequired,
   totalClothes: Proptypes.string.isRequired,
   washedClothes: Proptypes.string.isRequired,
   unwashedClothes: Proptypes.string.isRequired,
