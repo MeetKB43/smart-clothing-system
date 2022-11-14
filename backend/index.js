@@ -13,6 +13,9 @@ var io = require('socket.io')(http);
 var cors = require("cors");
 const dotenv = require('dotenv');
 const util = require('util');
+const axios = require('axios');
+var accuweather = require('node-accuweather')()('lAn0QeTwG0tTqST3rdyTOOYxxO1zGPFQ');
+const request = require('request');
 
 // Initialize environment config
 dotenv.config();
@@ -73,6 +76,86 @@ class Session {
    }
 }
 
+class weather{
+   
+   constructor(API_KEY,city,lat=null,long=null){
+      this.API_KEY = API_KEY;
+      this.city = city;
+      this.lat = lat;
+      this.long = long;
+      this.locationKey = null;
+      this.weatherDetail = null;
+   }
+
+   generateLocationKeyUrl() {
+      if(this.lat != null && this.long != null){
+         this.url = "http://dataservice.accuweather.com/locations/v1/cities/geoposition/search?apikey="+this.API_KEY+"&q="+this.lat+"%2C%20"+this.long;
+      }
+      else{
+         this.url = "http://dataservice.accuweather.com/locations/v1/cities/search?apikey="+this.API_KEY+"&q="+this.city;
+      }
+   }
+
+   getLocationKey() {
+      this.generateLocationKeyUrl();
+      return new Promise((resolve, reject) => {
+         request({ url: this.url, json: true }, function (err, res, body) {
+            err ? reject(`Forecast cannot be retrieved. ERROR: ${err}`) : null;
+            res.statusCode !== 200 ? reject(`Forecast cannot be retrieved. Response: ${res.statusCode} ${res.statusMessage}`) : null;
+            resolve(body)
+         })
+      })
+   }
+
+   async fatchLocationKey(){
+      var result = await this.getLocationKey();
+      if(Array.isArray(result))
+         this.locationKey = result[0]['Key'];
+      else
+         this.locationKey = result['Key'];
+   }
+
+   async getWeatherForecast(){
+      if(this.locationKey == null)
+         await this.fatchLocationKey()
+      this.url = "http://dataservice.accuweather.com/forecasts/v1/daily/1day/"+this.locationKey+"?apikey="+this.API_KEY+"&details=true&metric=true"
+      return new Promise((resolve, reject) => {
+         
+         request({ url: this.url, json: true }, function (err, res, body) {
+            err ? reject(`Forecast cannot be retrieved. ERROR: ${err}`) : null;
+            res.statusCode !== 200 ? reject(`Forecast cannot be retrieved. Response: ${res.statusCode} ${res.statusMessage}`) : null;
+            
+            var minTemp = body.DailyForecasts[0].Temperature.Minimum.Value;
+            var maxTemp = body.DailyForecasts[0].Temperature.Maximum.Value;
+            var feelsLikeMin = body.DailyForecasts[0].RealFeelTemperature.Minimum.Value;
+            var feelsLikeMax = body.DailyForecasts[0].RealFeelTemperature.Maximum.Value;
+            var DayPrecipitation = body.DailyForecasts[0].Day.HasPrecipitation;
+            if (DayPrecipitation){
+               var DayPrecipitationType = body.DailyForecasts[0].Day.PrecipitationType;
+               var DayPrecipitationIntensity = body.DailyForecasts[0].Day.PrecipitationIntensity
+            }else{
+               var DayPrecipitationType = null;
+               var DayPrecipitationIntensity = null;
+            }
+            var NightPrecipitation = body.DailyForecasts[0].Night.HasPrecipitation;
+            if (NightPrecipitation){
+               var NightPrecipitationType = body.DailyForecasts[0].Night.PrecipitationType;
+               var NightPrecipitationIntensity = body.DailyForecasts[0].Night.PrecipitationIntensity
+            }else{
+               var NightPrecipitationType = null;
+               var NightPrecipitationIntensity = null;
+            }
+            var AirQuality = body.DailyForecasts[0].AirAndPollen[0]['Value'];
+            var WindSpeed = body.DailyForecasts[0].Day.Wind.Speed.Value  
+            var WindDirect = body.DailyForecasts[0].Day.Wind.Direction.English   
+            var data = {"Min. Temp.":minTemp, "Max. Temp.":maxTemp, "Min. feels like":feelsLikeMin, "Max. feels like":feelsLikeMax, "Day":{"Precipitation": DayPrecipitation, "Precipitation Type": DayPrecipitationType, "Precipitation Intensity":DayPrecipitationIntensity}, "Night": {"Precipitation": NightPrecipitation, "Precipitation Type": NightPrecipitationType, "Precipitation Intensity":NightPrecipitationIntensity},"Air Quality Index":AirQuality, "Wind Speed":WindSpeed, "Wind Direction":WindDirect};
+            this.weatherDetail = data;
+            resolve(data)
+         })
+      })  
+   }
+}
+
 var sessions = {}
 var socket_devices= []
 
@@ -111,14 +194,24 @@ app.post('/register_device', function(req, res){
    var deviceID = req.body['deviceID'];
    var devicename = req.body['devicename'];
    var pin = req.body['pin'];
-   var data = [deviceID, devicename, pin]
+   
    var sql = "SELECT * from super_user WHERE deviceID = ?"
    con.query(sql, deviceID, function(err, result){
       if(err) throw err;
       if(result.length>0)
          res.status(403).send("This device is already linked with system");
    });
-   var sql = "INSERT INTO super_user VALUES (?,?,?)"
+   if(!req.body['lat'] || !req.body['long']){
+      lat = null;
+      long = null;
+   }
+   else{
+      lat = req.body['lat']
+      long = req.body['long']
+   }
+   var city = req.body['city']
+   var data = [deviceID, devicename, pin,city, lat, long]
+   var sql = "INSERT INTO super_user VALUES (?,?,?,?,?,?)"
    con.query(sql, data, function(err, result){
       if(err) throw err;
       res.status(200).send("A new device linked with system");
@@ -169,8 +262,7 @@ app.post('/register_user', function(req,res){
    var lastname = body['lastname'];
    var age = body['age'];
    var gender = body['gender'];
-   var city = body['city'];
-   var data = [null, deviceID, username, firstname, lastname, gender, age, city];
+   var data = [null, deviceID, username, firstname, lastname, gender, age];
 
    sql = "SELECT * FROM user_profile WHERE username = ?"
    con.query(sql, username, function(err,result){
@@ -179,7 +271,7 @@ app.post('/register_user', function(req,res){
          res.status(403).send("User already exist");
       }
       else{
-         sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
+         sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?)";
          con.query(sql, data, function (err, result) {
             if (err) throw err;
             res.status(200).send("A new user linked with this device");
@@ -293,10 +385,10 @@ app.post('/add_new_cloth', function(req,res){
 })
 
 app.post('/display_inventory', async function(req, res){
-   /*if(!validate_session(req)){
+   if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return 
-   }*/
+   }
 
    var body = req.body;
    var uID = body['uID'];
@@ -383,33 +475,70 @@ app.post('/display_users', function(req, res){
    })
 })
 
-app.post('/dashboard', function(req,res){
-   /*if(!validate_session(req)){
+app.post('/dashboard', async function(req,res){
+   if(!validate_session(req)){
       res.status(401).send('Invalid Session')
       return;
-   }*/
+   }
+   var response;
+   var users = []
    var deviceID = req.body['deviceID'];
    var sql = "SELECT * FROM user_profile WHERE deviceID = ?"
    const query = util.promisify(con.query).bind(con);
-   query(sql, deviceID,async function (err, result) {
-      if (err) {throw err}
-         for(i = 0;i < result.length;i++){
-            var username = result[i]['username']
-            var uID = result[i]['uID']
-            var sql1 = "SELECT * from inventory WHERE uID = ?";
-            
-            const query = util.promisify(con.query).bind(con);
-            try {
-               var result1 = await query(sql1,uID);
-               console.log("User: " + username + " has "+ result1.length + " washed cloths in his closet");
-            } finally {
-               
-            }
-         }
-      
-      res.status(200).send("Dashboard");
-   })
-   
+   var result;
+   try{
+      result = await query(sql, deviceID);
+   }catch{}
+   for(i = 0;i < result.length;i++){
+      var username = result[i]['username']
+      var uID = result[i]['uID']
+      var sql1 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2";
+      var sql2 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash >= 2";
+      var sql3 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 1"
+      var sql4 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 2"
+      var sql5 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 4"
+      var sql6 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 3 AND cSubType = 4"
+      const query = util.promisify(con.query).bind(con);
+      try {
+         var result1 = await query(sql1,uID);
+         var result2 = await query(sql2,uID);
+         var result3 = await query(sql3,uID);
+         var result4 = await query(sql4,uID);
+         var result5 = await query(sql5,uID);
+         var result6 = await query(sql6,uID);
+         users[i] = {'username':username,'uID':uID,'Washed cloths':result1.length,'Unwashed cloths': result2.length,'Top wear': result3.length,'Bottom wear': result4.length, 'Sports wear': result5.length,'Night wear':result6.length};
+         
+      } finally {}
+   }
+   try{
+      result = await query(sql, deviceID)
+   }finally{}
+   var w = new weather('RGzQgQI5L1Co5OJvsyGY5AFEQ0wDVlTT','Windsor',42.314938,-83.036362);
+   var weatherDetails = await w.getWeatherForecast();
+   var Notification=[];
+   if(weatherDetails['Min. Temp.']<=0){
+      Notification.push({"Weather condition":"very cold"})
+   }else if(weatherDetails['Min. Temp.']>0 && weatherDetails['Min. Temp.']<15){
+      Notification.push({"Weather condition":"cold"})
+   }
+   if(weatherDetails['Max. Temp.']>25 && weatherDetails['Max. Temp.']<=35){
+      Notification.push({"Weather condition":"warm"})
+   }else if(weatherDetails['Max. Temp.']>35){
+      Notification.push({"Weather condition":"hot"})
+   }
+   if(weatherDetails["Air Quality Index"]>150 && weatherDetails["Air Quality Index"]<=300){
+      Notification.push({"Air Quality":"Severe and unhealthy"})
+   }else if(weatherDetails["Air Quality Index"]>300){
+      Notification.push({"Air Quality":"Hazardous"})
+   }
+   if(weatherDetails["Wind Speed"] > 35){
+      Notification.push({"Wind condition":"Heavy wind"})
+   }
+   if(weatherDetails["Day"]["Precipitation"] == true){
+      Notification.push({"Precipitation Type":weatherDetails["Day"]["Precipitation Type"], "Precipitation Intensity": weatherDetails["Day"]["Precipitation Intensity"]})
+   }
+   response = {"userOverview":users, "Weather detail":weatherDetails, "Notification": Notification}
+   res.status(200).send(response);
 })
 
 io.on('connection', function(socket){
@@ -427,10 +556,16 @@ var server = http.listen(appPort, function () {
    console.log(server.address());
 })
 
-
-//dashboard
-/*Inventory
-washed
-unwashed
-formal
-casual*/
+/*app.post('/insertMultiple',function(req,res){
+   RFID = 123456780;
+   const query = util.promisify(con.query).bind(con);
+   var sql = "INSERT INTO inventory VALUES (?,?,?,?,?,?,?)";
+   for(i = 0; i< 50; i++){
+      cType = parseInt(Math.random()*4)+1;
+      cSubType = parseInt(Math.random()*4)+1;
+      try{
+         var result = query(sql, [RFID, 123456, 5857573, cType, cSubType, 0, 1])
+      }catch{}
+      RFID += 1;
+   }   
+})*/
