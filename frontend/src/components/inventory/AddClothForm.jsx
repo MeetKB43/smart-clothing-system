@@ -138,9 +138,8 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
   const [subCategories, setSubCategories] = useState([]);
 
   useEffect(() => {
-    setSubCategories(
-      ClothCategories.filter((c) => c.id === selectedCategory).map((c) => c.subCategories)
-    );
+    const arr = ClothCategories.filter((c) => c.id === selectedCategory)[0]?.subCategories;
+    setSubCategories(arr);
   }, [selectedCategory]);
 
   // eslint-disable-next-line no-unused-vars
@@ -255,9 +254,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
             <ClothDataSelection
               setActiveStep={setActiveStep}
               setSelectedData={setSelectedSubCategory}
-              dataList={ClothCategories.filter((c) => c.id === selectedCategory).map(
-                (c) => c.subCategories
-              )}
+              dataList={subCategories}
             />
           )}
           {activeStep === STEPS.ATTACH_TAG && <AttachTag />}
