@@ -28,6 +28,7 @@ export const UserActionsProvider = ({ children }) => {
   const [detectedClothes, setDetectedClothes] = useState([]);
 
   const closeDialog = () => {
+    setDetectedClothes([]);
     setIsOpen(false);
   };
 
@@ -55,10 +56,22 @@ export const UserActionsProvider = ({ children }) => {
             : 'Cloth has been taken from the closet.'
         );
         setTakenClothes((ps) => ps + 1);
+        setDetectedClothes((ps) => {
+          const arrCpy = [...ps];
 
+          arrCpy.push({
+            RFID: d?.RFID,
+            deviceID: DEVICE_ID,
+            category: getCategoryName(d?.cType),
+            subCategory: getSubCategoryName(d?.cType, d?.cSubType),
+          });
+
+          return arrCpy;
+        });
         // Remove taken cloth buffer value after 1min
         setTimeout(() => {
           setTakenClothes(0);
+          setDetectedClothes([]);
         }, 60000);
       }
 
@@ -88,12 +101,13 @@ export const UserActionsProvider = ({ children }) => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [takenClothes, detectedClothes]);
+  }, [takenClothes, detectedClothes, action]);
 
   const submitWashedClothInfo = async () => {
     try {
       await saveWashedClothesInfo(detectedClothes);
       showSuccessToastr('Clothes information updated successfully.');
+      setDetectedClothes([]);
       closeDialog();
     } catch ({ response }) {
       showErrorToastr(
