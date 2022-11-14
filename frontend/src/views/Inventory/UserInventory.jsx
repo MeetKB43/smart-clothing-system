@@ -27,7 +27,7 @@ const useStyles = makeStyles(TableListing);
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
 const UserInventory = ({ match }) => {
-  const uID = Number(match.params.id) || 0;
+  const uID = Number(match.params.uID) || 0;
   const pageName = 'User Inventory';
   const classes = useStyles();
 
@@ -201,7 +201,7 @@ const UserInventory = ({ match }) => {
 UserInventory.propTypes = {
   match: PropTypes.shape({
     params: PropTypes.shape({
-      id: PropTypes.number,
+      uID: PropTypes.number,
     }),
   }),
 };
@@ -209,7 +209,7 @@ UserInventory.propTypes = {
 UserInventory.defaultProps = {
   match: {
     params: {
-      id: 0,
+      uID: 0,
     },
   },
 };

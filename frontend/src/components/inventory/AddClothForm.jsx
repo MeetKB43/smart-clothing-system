@@ -15,10 +15,13 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
+import * as uuid from 'device-uuid';
 import { getProfilesList } from '../../api/Profile';
 import { addNewCloth } from '../../api/Clothes';
 import useToastr from '../../hooks/useToastr';
-import { ClothCategories } from '../../configs';
+import { ClothCategories, RFID_PACKET_TYPE } from '../../configs';
+
+const DEVICE_ID = new uuid.DeviceUUID().get();
 
 const ProfileSelection = ({ setActiveStep }) => {
   const { showErrorToastr } = useToastr();
@@ -175,9 +178,16 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
   // const labels = ['Select Profile', 'Select Cloth Category', 'Attach RFID', 'Done'];
   const labels = ['Select Cloth Category', 'Select Cloth Sub Category', 'Attach RFID', 'Done'];
 
-  const addClothToSystem = (data) => {
+  const addClothToSystem = (rfid) => {
     setProcessing(true);
-    addNewCloth(data)
+
+    addNewCloth({
+      RFID: rfid,
+      uID: selectedProfile,
+      cType: selectedCategory,
+      cSubType: selectedSubCategory,
+      deviceID: DEVICE_ID,
+    })
       .then(() => {
         setActiveStep(STEPS.FINAL_MSG);
         setProcessing(false);
@@ -187,25 +197,19 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
         setProcessing(false);
       });
   };
+
   useEffect(() => {
     const ENDPOINT = '127.0.0.1:8000';
     const socket = socketIOClient(ENDPOINT);
     socket.on('connect', () => {
-      // connected
+      socket.emit('connected', DEVICE_ID);
     });
 
-    socket.on('disconnect', () => {
-      // disconnected
-    });
+    socket.on('disconnect', () => {});
 
     socket.on('RFID scanned', async (d) => {
-      if (d[0] === 'Cloth Scanned') {
-        addClothToSystem({
-          RFID: d[2],
-          uID: selectedProfile,
-          cType: selectedCategory,
-          subCatType: selectedSubCategory,
-        });
+      if (d?.pkt_Type === RFID_PACKET_TYPE.ADD_NEW_CLOTH) {
+        addClothToSystem(d?.RFID);
       }
     });
 
@@ -214,7 +218,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, []);
+  }, [selectedSubCategory]);
 
   return (
     <Dialog open maxWidth="md" fullWidth>
@@ -266,20 +270,21 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
       </DialogContent>
 
       <DialogActions>
-        {activeStep > 0 && (
-          <Button
-            variant="contained"
-            type="submit"
-            onClick={() => {
-              setActiveStep((ps) => ps - 1);
-            }}
-            color="primary"
-            endIcon={processing && <CircularProgress color="secondary" size={18} />}
-            disabled={processing}
-          >
-            {processing ? 'Processing' : 'Back'}
-          </Button>
-        )}
+        {activeStep > 0 ||
+          (activeStep === labels.length - 1 && (
+            <Button
+              variant="contained"
+              type="submit"
+              onClick={() => {
+                setActiveStep((ps) => ps - 1);
+              }}
+              color="primary"
+              endIcon={processing && <CircularProgress color="secondary" size={18} />}
+              disabled={processing}
+            >
+              {processing ? 'Processing' : 'Back'}
+            </Button>
+          ))}
         <Button onClick={closeDialog} variant="contained" color="secondary">
           Close
         </Button>

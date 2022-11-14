@@ -135,4 +135,10 @@ export const USER_ACTIONS = {
   NA_ACTION_DETECTED: 4,
 };
 
+export const RFID_PACKET_TYPE = {
+  ADD_NEW_CLOTH: 0,
+  PUT_CLOTH: 1,
+  TAKE_CLOTH: 2,
+};
+
 export { RoutePaths };
