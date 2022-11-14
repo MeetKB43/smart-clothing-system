@@ -128,6 +128,20 @@ export const ClothCategories = [
   },
 ];
 
+export const getCategoryName = (catId) => {
+  const catDetails = ClothCategories.filter((c) => c.id === catId);
+  return catDetails.length > 0 ? catDetails[0].name : 'NA';
+};
+
+export const getSubCategoryName = (catId, subCatId) => {
+  const catDetails = ClothCategories.filter((c) => c.id === catId);
+  if (catDetails.length > 0) {
+    const subCatDetails = catDetails[0].subCategories.filter((c) => c.id === subCatId);
+    return subCatDetails.length > 0 ? subCatDetails[0].name : 'NA';
+  }
+  return 'NA';
+};
+
 export const USER_ACTIONS = {
   TAKE_CLOTH: 1,
   PUT_WASHED_CLOTH: 2,
@@ -139,6 +153,12 @@ export const RFID_PACKET_TYPE = {
   ADD_NEW_CLOTH: 0,
   PUT_CLOTH: 1,
   TAKE_CLOTH: 2,
+};
+
+export const LAUNDRY_STATE = {
+  NA: 0,
+  WASHED: 1,
+  UNWASHED: 2,
 };
 
 export { RoutePaths };

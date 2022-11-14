@@ -10,7 +10,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { IconButton } from '@mui/material';
+import { IconButton, Pagination } from '@mui/material';
 import * as uuid from 'device-uuid';
 import SwipeUpAltIcon from '@mui/icons-material/SwipeUpAlt';
 import { PrivateWrapper } from '../../components/layouts';
@@ -20,7 +20,7 @@ import AddClothForm from '../../components/inventory/AddClothForm';
 import useToastr from '../../hooks/useToastr';
 import { deleteCloth, getUserInventoryList } from '../../api/Clothes';
 import useUserActions from '../../hooks/useUserActions';
-import { USER_ACTIONS } from '../../configs';
+import { getCategoryName, getSubCategoryName, USER_ACTIONS } from '../../configs';
 
 const useStyles = makeStyles(TableListing);
 
@@ -37,6 +37,8 @@ const UserInventory = ({ match }) => {
   const [rows, setRows] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [reloadRows, setReloadRows] = useState(false);
+  const [activePage, setActivePage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [selectedCloth, setSelectedCloth] = useState(0);
   const [showClothForm, setShowClothForm] = useState(false);
@@ -50,9 +52,10 @@ const UserInventory = ({ match }) => {
   useEffect(() => {
     setDataLoaded(false);
 
-    getUserInventoryList({ uID, deviceID: DEVICE_ID })
+    getUserInventoryList({ uID, deviceID: DEVICE_ID, page: 0 })
       .then((data) => {
-        setRows(data);
+        setRows(data?.results || []);
+        setTotalPages(data?.pagination?.totalPages || 1);
         setDataLoaded(true);
       })
       .catch(() => {
@@ -149,16 +152,16 @@ const UserInventory = ({ match }) => {
               )}
               {dataLoaded &&
                 rows.map((row) => (
-                  <TableRow key={`profile-${row.id}`}>
-                    <TableCell>{row.category}</TableCell>
-                    <TableCell>{row.subCategory}</TableCell>
+                  <TableRow key={`clothes-${row.RFID}`}>
+                    <TableCell>{getCategoryName(row.cType)}</TableCell>
+                    <TableCell>{getSubCategoryName(row.cType, row.cSubType)}</TableCell>
                     <TableCell align="right">
                       <IconButton
                         aria-label="delete"
                         className={classes.deleteBtn}
                         onClick={() => {
                           setShowConfirmDeleteDialog(true);
-                          setSelectedCloth(row.uID);
+                          setSelectedCloth(row.RFID);
                         }}
                       >
                         <DeleteIcon fontSize="small" color="error" />
@@ -169,7 +172,19 @@ const UserInventory = ({ match }) => {
             </TableBody>
           </Table>
         </TableContainer>
-
+        {dataLoaded && totalPages > 1 && (
+          <Pagination
+            count={totalPages}
+            showFirstButton
+            showLastButton
+            className={classes.tablePagination}
+            onChange={(_, pageNumber) => {
+              setActivePage(pageNumber);
+              setReloadRows(!reloadRows);
+            }}
+            page={activePage}
+          />
+        )}
         {showClothForm && (
           <AddClothForm
             selectedProfile={uID}

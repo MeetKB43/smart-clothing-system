@@ -16,7 +16,7 @@ import { USER_ACTIONS } from '../../configs';
 
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
-const UserActionsDialog = ({ action, closeDialog, open, detectedClothes }) => (
+const UserActionsDialog = ({ action, closeDialog, open, detectedClothes, onConfirm }) => (
   <div>
     <Dialog open={open} fullScreen onClose={closeDialog} TransitionComponent={Transition}>
       <AppBar sx={{ position: 'relative' }}>
@@ -31,7 +31,7 @@ const UserActionsDialog = ({ action, closeDialog, open, detectedClothes }) => (
             {action === USER_ACTIONS.NA_ACTION_DETECTED &&
               'List of unindentified status of clothes '}
           </Typography>
-          <Button autoFocus color="secondary" onClick={closeDialog}>
+          <Button autoFocus color="secondary" onClick={onConfirm}>
             Confirm
           </Button>
         </Toolbar>
@@ -54,6 +54,7 @@ UserActionsDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   action: PropTypes.string.isRequired,
   closeDialog: PropTypes.func.isRequired,
+  onConfirm: PropTypes.func.isRequired,
   detectedClothes: PropTypes.arrayOf(
     PropTypes.shape({
       uID: PropTypes.number.isRequired,

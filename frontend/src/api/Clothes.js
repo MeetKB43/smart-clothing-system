@@ -5,12 +5,14 @@ export const addNewCloth = async (payload) => {
   return result.data;
 };
 
-export const getUserInventoryList = async ({ uID, deviceID }) =>
-  new Array(10).fill(undefined).map((c, i) => ({
-    uID,
-    category: `Category ${i}`,
-    subCategory: `Sub Category ${i}`,
-    deviceID,
-  }));
+export const getUserInventoryList = async ({ uID, deviceID, page }) => {
+  const result = await postApiCall('/display_inventory', { uID, deviceID, page, entryPerPage: 20 });
+  return result.data;
+};
+
+export const saveWashedClothesInfo = async (payload) => {
+  const result = await postApiCall('/add_cloths', payload);
+  return result.data;
+};
 
 export const deleteCloth = async () => {};

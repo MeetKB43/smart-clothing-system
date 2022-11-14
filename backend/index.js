@@ -252,14 +252,14 @@ app.post('/cloth_scanned',async function(req,res){
          sql = "UPDATE inventory SET availableInCloset = 0 WHERE RFID = ? AND deviceID = ?"
          result2 = await query(sql, [RFID, deviceID])
          c1 = new Scanned_Cloth("take_cloth", 2, RFID, deviceID);
-         io.to(socket_devices[deviceID]).emit('RFID scanned',c1) //0: new cloth, 1: put cloth, 2: take cloth
+         io.to(socket_devices[deviceID]).emit('RFID scanned',{...result[0],...c1}) //0: new cloth, 1: put cloth, 2: take cloth
       }
       else{
          var counter = result[0]['usedBeforeWash'] + 1;
          sql = "UPDATE inventory SET availableInCloset = 1, usedBeforeWash = ? WHERE RFID = ? AND deviceID = ?"
          await query(sql, [counter, RFID, deviceID])
          c1 = new Scanned_Cloth("put_cloth", 1, RFID, deviceID);
-         io.to(socket_devices[deviceID]).emit('RFID scanned',c1) //0: new cloth, 1: put cloth, 2: take cloth
+         io.to(socket_devices[deviceID]).emit('RFID scanned',{...result[0],...c1}) //0: new cloth, 1: put cloth, 2: take cloth
       }
    }
    else{
@@ -337,7 +337,8 @@ app.post('/display_inventory', async function(req, res){
         current: page,
         perPage: numPerPage,
         previous: page > 0 ? page - 1 : undefined,
-        next: page < numPages - 1 ? parseInt(page) + 1 : undefined
+        next: page < numPages - 1 ? parseInt(page) + 1 : undefined,
+        totalPages:numPages
       }
     }
     else responsePayload.pagination = {
