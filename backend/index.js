@@ -517,27 +517,27 @@ app.post('/dashboard', async function(req,res){
    var weatherDetails = await w.getWeatherForecast();
    var Notification=[];
    if(weatherDetails['Min. Temp.']<=0){
-      Notification.push({"Weather condition":"very cold"})
+      Notification.push({"title":"Weather condition","body":"Very cold temperature, Use Snow Jacket"})
    }else if(weatherDetails['Min. Temp.']>0 && weatherDetails['Min. Temp.']<15){
-      Notification.push({"Weather condition":"cold"})
+      Notification.push({"title":"Weather condition","body":"Cool temperature, Use Winter Jacket"})
    }
    if(weatherDetails['Max. Temp.']>25 && weatherDetails['Max. Temp.']<=35){
-      Notification.push({"Weather condition":"warm"})
+      Notification.push({"title":"Weather condition","body":"Warm temperature, Wear cotton or loose cloths"})
    }else if(weatherDetails['Max. Temp.']>35){
-      Notification.push({"Weather condition":"hot"})
+      Notification.push({"title":"Weather condition","body":"Hot temperature, Wear cotton or loose cloths"})
    }
    if(weatherDetails["Air Quality Index"]>150 && weatherDetails["Air Quality Index"]<=300){
-      Notification.push({"Air Quality":"Severe and unhealthy"})
+      Notification.push({"title":"Air Quality","body":"Severe and unhealthy air quality"})
    }else if(weatherDetails["Air Quality Index"]>300){
-      Notification.push({"Air Quality":"Hazardous"})
+      Notification.push({"title":"Air Quality","body":"Hazardous air quality, use mask and face sheild"})
    }
    if(weatherDetails["Wind Speed"] > 35){
-      Notification.push({"Wind condition":"Heavy wind"})
+      Notification.push({"title":"Wind condition","body":"Heavy wind outside"});
    }
    if(weatherDetails["Day"]["Precipitation"] == true){
-      Notification.push({"Precipitation Type":weatherDetails["Day"]["Precipitation Type"], "Precipitation Intensity": weatherDetails["Day"]["Precipitation Intensity"]})
+      Notification.push({"title":"Precipitation Type","body":weatherDetails["Day"]["Precipitation Intensity"] + " " +weatherDetails["Day"]["Precipitation Type"] + " is expected" })
    }
-   response = {"userOverview":users, "Weather detail":weatherDetails, "Notification": Notification}
+   response = {"userOverview":users, "WeatherDetails":weatherDetails, "Notification": Notification}
    res.status(200).send(response);
 })
 
