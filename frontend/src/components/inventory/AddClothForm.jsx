@@ -83,7 +83,7 @@ FinalStep.propTypes = {
 const ClothDataSelection = ({ setActiveStep, dataList, setSelectedData }) => (
   <List sx={{ width: '100%', bgcolor: 'background.paper' }}>
     <Grid container spacing={2}>
-      {dataList.map((c) => (
+      {dataList?.map((c) => (
         <Grid item xs={12} md={6}>
           <ListItemButton
             onClick={() => {
@@ -152,7 +152,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
           <ClothDataSelection
             setActiveStep={setActiveStep}
             setSelectedData={setSelectedCategory}
-            dataList={ClothCategories}
+            dataList={ClothCategories || []}
           />
         );
       case STEPS.SUB_CAT_SELECTION:
@@ -160,7 +160,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
           <ClothDataSelection
             setActiveStep={setActiveStep}
             setSelectedData={setSelectedSubCategory}
-            dataList={subCategories}
+            dataList={subCategories || []}
           />
         );
       case STEPS.ATTACH_TAG:
