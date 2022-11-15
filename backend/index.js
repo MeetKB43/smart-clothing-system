@@ -347,9 +347,8 @@ app.post('/cloth_scanned',async function(req,res){
          io.to(socket_devices[deviceID]).emit('RFID scanned',{...result[0],...c1}) //0: new cloth, 1: put cloth, 2: take cloth
       }
       else{
-         var counter = result[0]['usedBeforeWash'] + 1;
-         sql = "UPDATE inventory SET availableInCloset = 1, usedBeforeWash = ? WHERE RFID = ? AND deviceID = ?"
-         await query(sql, [counter, RFID, deviceID])
+         sql = "UPDATE inventory SET availableInCloset = 1, used = ? WHERE RFID = ? AND deviceID = ?"
+         await query(sql, [1, RFID, deviceID])
          c1 = new Scanned_Cloth("put_cloth", 1, RFID, deviceID);
          io.to(socket_devices[deviceID]).emit('RFID scanned',{...result[0],...c1}) //0: new cloth, 1: put cloth, 2: take cloth
       }
@@ -468,7 +467,7 @@ app.post('/add_cloths',async function(req,res){
    }
    
    for(i = 0; i < data.length; i++){
-      sql = "UPDATE inventory SET usedBeforeWash = 0 WHERE RFID = ? AND deviceID = ?"
+      sql = "UPDATE inventory SET used = 0 WHERE RFID = ? AND deviceID = ?"
       con.query(sql,data[i],function(err,result){
          if(err) {throw err}
       })
@@ -506,12 +505,12 @@ app.post('/dashboard', async function(req,res){
    for(i = 0;i < result.length;i++){
       var username = result[i]['username']
       var uID = result[i]['uID']
-      var sql1 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2";
-      var sql2 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash >= 2";
-      var sql3 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 1"
-      var sql4 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 2"
-      var sql5 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 4"
-      var sql6 = "SELECT * from inventory WHERE uID = ? AND usedBeforeWash < 2 AND cType = 3 AND cSubType = 4"
+      var sql1 = "SELECT * from inventory WHERE uID = ? AND used = 0";
+      var sql2 = "SELECT * from inventory WHERE uID = ? AND used = 1";
+      var sql3 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND cType = 1"
+      var sql4 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND cType = 2"
+      var sql5 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND cType = 4"
+      var sql6 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND cType = 3 AND cSubType = 4"
       const query = util.promisify(con.query).bind(con);
       try {
          var result1 = await query(sql1,uID);
