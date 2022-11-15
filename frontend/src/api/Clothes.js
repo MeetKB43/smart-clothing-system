@@ -15,4 +15,9 @@ export const saveWashedClothesInfo = async (payload) => {
   return result.data;
 };
 
+export const getOverview = async (deviceID) => {
+  const result = await postApiCall('/dashboard', { deviceID });
+  return result.data;
+};
+
 export const deleteCloth = async () => {};

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
 import { CircularProgress, Box, Grid } from '@mui/material';
-import { getSuggestionsList } from '../api/Suggestions';
 import { PrivateWrapper } from '../components/layouts';
 import useToastr from '../hooks/useToastr';
 import SuggestionTile from '../components/home/SuggestionTile';
+import { getOverview } from '../api/Clothes';
 
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
@@ -18,9 +18,9 @@ const Suggestions = () => {
 
   useEffect(() => {
     setDataLoaded(false);
-    getSuggestionsList({ deviceID: DEVICE_ID })
+    getOverview(DEVICE_ID)
       .then((data) => {
-        setRows([...data, ...data, ...data, ...data]); // TODO: delete static data later
+        setRows(data?.Notification || []); // TODO: delete static data later
         setDataLoaded(true);
       })
       .catch(({ response }) => {

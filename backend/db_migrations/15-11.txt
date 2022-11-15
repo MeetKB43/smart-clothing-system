@@ -1,0 +1,3 @@
+ALTER TABLE `super_user` ADD `lat` FLOAT NULL AFTER `pin`;
+ALTER TABLE `super_user` ADD `long` FLOAT NULL AFTER `lat`;
+ALTER TABLE `inventory` CHANGE `usedBeforeWash` `used` INT(11) NOT NULL;

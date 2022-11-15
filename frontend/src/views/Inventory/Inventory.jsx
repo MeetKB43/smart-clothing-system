@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
 import { CircularProgress, Box, Grid } from '@mui/material';
-import { getProfilesList } from '../../api/Profile';
 import { PrivateWrapper } from '../../components/layouts';
 import useToastr from '../../hooks/useToastr';
 import { RoutePaths } from '../../configs';
 import InventoryInfoCard from '../../components/inventory/InventoryInfoCard';
+import { getOverview } from '../../api/Clothes';
 
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
@@ -20,18 +20,9 @@ const InventoryStats = () => {
   useEffect(() => {
     setDataLoaded(false);
     setDataLoadError('');
-    getProfilesList({ deviceID: DEVICE_ID })
+    getOverview(DEVICE_ID)
       .then((data) => {
-        setRows(
-          data.map((d) => ({
-            ...d,
-            name: d.username,
-            totalClothes: 10,
-            washedClothes: 6,
-            unwashedClothes: 4,
-          }))
-        ); // TODO: delete static data later
-
+        setRows(data?.userOverview || []); // TODO: delete static data later
         setDataLoaded(true);
       })
       .catch(({ response }) => {
@@ -59,9 +50,9 @@ const InventoryStats = () => {
           <Grid key={r.username} item>
             <InventoryInfoCard
               heading={r.username}
-              totalClothes={r.totalClothes}
-              washedClothes={r.washedClothes}
-              unwashedClothes={r.unwashedClothes}
+              totalClothes={r['Unwashed cloths'] + r['Washed cloths'] || 'NA'}
+              washedClothes={r['Washed cloths'] || 'NA'}
+              unwashedClothes={r['Unwashed cloths'] || 'NA'}
               link={RoutePaths.USER_INVENTORY.replace(':uID', r.uID)}
             />
           </Grid>

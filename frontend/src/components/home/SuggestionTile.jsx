@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useTheme, lighten, darken } from '@mui/material/styles';
-import { Grid, Typography } from '@mui/material';
+import { Grid, Typography, Divider, ListItemText, ListItem } from '@mui/material';
 
 const SuggestionTile = ({ data }) => {
   const theme = useTheme();
@@ -32,36 +33,44 @@ const SuggestionTile = ({ data }) => {
   };
 
   return (
-    <Grid container direction="column">
-      <Grid item>
-        <Grid
-          container
-          alignItems="center"
-          justifyContent="space-between"
-          sx={{
-            cursor: 'pointer',
-            backgroundColor: getBgValue(data.priority, 0.5),
-            color: getColorValue(data.priority, 0.5),
-            p: 1,
-            borderRadius: 1,
-            mb: 1,
-          }}
-        >
-          <Grid item>
-            <Typography variant="subtitle2" color="inherit">
-              {data.title}
-            </Typography>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+    <>
+      <ListItem button>
+        <ListItemText primary={data.title} secondary={data.body} />
+      </ListItem>
+      <Divider />
+    </>
   );
+  // return (
+  //   <Grid container direction="column">
+  //     <Grid item>
+  //       <Grid
+  //         container
+  //         alignItems="center"
+  //         justifyContent="space-between"
+  //         sx={{
+  //           cursor: 'pointer',
+  //           // backgroundColor: getBgValue(data.priority, 0.5),
+  //           // color: getColorValue(data.priority, 0.5),
+  //           p: 1,
+  //           py: 2,
+  //           borderRadius: 1,
+  //         }}
+  //       >
+  //         <Grid item>
+  //           <Typography variant="subtitle2" color="inherit">
+  //             {data.title}
+  //           </Typography>
+  //         </Grid>
+  //       </Grid>
+  //     </Grid>
+  //     <Divider />
+  //   </Grid>
 };
 
 SuggestionTile.propTypes = {
   data: PropTypes.shape({
     title: PropTypes.string.isRequired,
-    priority: PropTypes.number.isRequired,
+    body: PropTypes.string.isRequired,
   }).isRequired,
 };
 

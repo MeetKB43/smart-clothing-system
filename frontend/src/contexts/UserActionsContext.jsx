@@ -34,6 +34,7 @@ export const UserActionsProvider = ({ children }) => {
 
   const showUserActionDialog = (userAction) => {
     setAction(userAction);
+    setDetectedClothes([]);
     setIsOpen(true);
   };
 
