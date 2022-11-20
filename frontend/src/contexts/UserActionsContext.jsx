@@ -51,11 +51,7 @@ export const UserActionsProvider = ({ children }) => {
     socket.on('RFID scanned', async (d) => {
       if (d?.pkt_Type === RFID_PACKET_TYPE.TAKE_CLOTH) {
         // incase of multiple clothes taken from the closet, show appropiate number of clothes till 1min
-        showSuccessToastr(
-          takenClothes > 1
-            ? `${takenClothes} Clothes has been taken from the closet.`
-            : 'Cloth has been taken from the closet.'
-        );
+        showSuccessToastr('Cloth has been taken from the closet.');
         setTakenClothes((ps) => ps + 1);
         setDetectedClothes((ps) => {
           const arrCpy = [...ps];
@@ -73,7 +69,7 @@ export const UserActionsProvider = ({ children }) => {
         setTimeout(() => {
           setTakenClothes(0);
           setDetectedClothes([]);
-        }, 60000);
+        }, 1000);
       }
 
       if (d?.pkt_Type === RFID_PACKET_TYPE.PUT_CLOTH) {

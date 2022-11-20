@@ -50,9 +50,9 @@ const InventoryStats = () => {
           <Grid key={r.username} item>
             <InventoryInfoCard
               heading={r.username}
-              totalClothes={r['Unwashed cloths'] + r['Washed cloths'] || 'NA'}
-              washedClothes={r['Washed cloths'] || 'NA'}
-              unwashedClothes={r['Unwashed cloths'] || 'NA'}
+              totalClothes={r['Unwashed cloths'] + r['Washed cloths'] || '0'}
+              washedClothes={r['Washed cloths'] || '0'}
+              unwashedClothes={r['Unwashed cloths'] || '0'}
               link={RoutePaths.USER_INVENTORY.replace(':uID', r.uID)}
             />
           </Grid>

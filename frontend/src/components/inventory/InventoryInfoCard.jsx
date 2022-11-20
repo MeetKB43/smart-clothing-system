@@ -73,8 +73,8 @@ const InventoryInfoCard = ({ heading, totalClothes, washedClothes, unwashedCloth
         </Box>
         <Box sx={{ mt: 3 }}>
           <Typography sx={{ p: 0, m: 0 }} variant="body" component="div">
-            You have {Math.ceil((washedClothes / totalClothes) * 100)} % of washed clothes to wear
-            in your closet.
+            You have {Math.ceil((washedClothes / totalClothes) * 100) || 0} % of washed clothes to
+            wear in your closet.
           </Typography>
         </Box>
       </CardContent>

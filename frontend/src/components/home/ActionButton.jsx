@@ -9,6 +9,8 @@ const ActionButton = ({ action }) => {
 
   const getActionTextValue = () => {
     switch (action) {
+      case USER_ACTIONS.ADD_NEW_CLOTH:
+        return 'Add new Cloth';
       case USER_ACTIONS.PUT_WASHED_CLOTH:
         return 'Add Washed Clothes';
       case USER_ACTIONS.PUT_UNWASHED_CLOTH:

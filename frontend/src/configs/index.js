@@ -143,6 +143,7 @@ export const getSubCategoryName = (catId, subCatId) => {
 };
 
 export const USER_ACTIONS = {
+  ADD_NEW_CLOTH: 0,
   TAKE_CLOTH: 1,
   PUT_WASHED_CLOTH: 2,
   PUT_UNWASHED_CLOTH: 3,
