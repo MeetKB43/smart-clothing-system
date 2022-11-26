@@ -15,8 +15,8 @@ const dotenv = require('dotenv');
 const util = require('util');
 const axios = require('axios');
 var accuweather = require('node-accuweather')()('lAn0QeTwG0tTqST3rdyTOOYxxO1zGPFQ');
-const request = require('request');
-
+const request = require('request');-
+const Joi = require('joi');
 // Initialize environment config
 dotenv.config();
 
@@ -538,6 +538,40 @@ app.post('/dashboard', async function(req,res){
    }
    response = {"userOverview":users, "WeatherDetails":weatherDetails, "Notification": Notification}
    res.status(200).send(response);
+})
+
+app.post('/suggestClothes',async function(req, res){
+   if(!validate_session(req)){
+      res.status(401).send('Invalid Session')
+      return;
+   }
+   var deviceID = req.body['deviceID'];
+   var uID = req.body['uID'];
+   //formal event
+   const query = util.promisify(con.query).bind(con);
+   sql = "SELECT * from user_profile WHERE uID = ? AND deviceID = ?"
+   try{
+      var result = await query(sql,[uID,deviceID]);
+   }finally{}
+   if(result.length == 0){
+      res.status(403).send('Pass valid User ID and device ID')
+   }
+   cType = 1
+   cSubType = 3
+   sql = "SELECT * from inventory WHERE uID = ? AND deviceID = ? AND cType = ? AND cSubType = ? AND used = 0 AND availableInCloset = 1"
+   try{
+      var result = await query(sql,[uID,deviceID,cType,cSubType]);
+   }finally{}
+   if(result.length == 0){
+      res.status(200).send('No Washed clothes available suitable for today\'s event')
+   }
+   response = []
+   for(i = 0; i< result.length;i++){
+      temp = result[i]
+      a = {'RFID':temp['RFID'], 'cType':temp['cType'],'cSubType':temp['cSubType']}
+      response.push(a)
+   }
+   res.status(200).send(response)
 })
 
 io.on('connection', function(socket){
