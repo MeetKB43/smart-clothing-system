@@ -14,7 +14,7 @@ var cors = require("cors");
 const dotenv = require('dotenv');
 const util = require('util');
 const axios = require('axios');
-var accuweather = require('node-accuweather')()('lAn0QeTwG0tTqST3rdyTOOYxxO1zGPFQ');
+var accuweather = require('node-accuweather')()('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSOR');
 const request = require('request');
 dotenv.config();
 const { google } = require('googleapis');
@@ -519,8 +519,27 @@ app.post('/dashboard', async function (req, res) {
     try {
         result = await query(sql, deviceID)
     } finally { }
-    var w = new weather('xtqujVmP2MLpMbK8FT46wAwV5E4HIpzr', 'Windsor', 42.314938, -83.036362);
-    var weatherDetails = await w.getWeatherForecast();
+    var w = new weather('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSOR', 'Windsor', 42.314938, -83.036362);
+    //var weatherDetails = await w.getWeatherForecast();
+    const weatherDetails = {
+        'Min. Temp.': 2.8,
+        'Max. Temp.': 6.1,
+        'Min. feels like': 0.6,
+        'Max. feels like': 7.8,
+        Day: {
+          Precipitation: false,
+          'Precipitation Type': null,    
+          'Precipitation Intensity': null
+        },
+        Night: {
+          Precipitation: false,
+          'Precipitation Type': null,
+          'Precipitation Intensity': null
+        },
+        'Air Quality Index': 75,
+        'Wind Speed': 8,
+        'Wind Direction': 'W'
+      }
     var Notification = [];
     if (weatherDetails['Min. Temp.'] <= 0) {
         Notification.push({ "title": "Weather condition", "body": "Very cold temperature, Use Snow Jacket" })
