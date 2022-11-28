@@ -1,7 +1,8 @@
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
-import { CircularProgress, Box, Grid } from '@mui/material';
-import GoogleLogin from 'react-google-login';
+import { CircularProgress, Box, Grid, Button } from '@mui/material';
+import { GoogleLogin } from '@react-oauth/google';
 import { PrivateWrapper } from '../components/layouts';
 import useToastr from '../hooks/useToastr';
 import Notifications from '../components/home/Suggestions';
@@ -15,7 +16,7 @@ const DEVICE_ID = new uuid.DeviceUUID().get();
 
 const Home = () => {
   const pageName = 'Home';
-  const { showErrorToastr } = useToastr();
+  const { showSuccessToastr, showErrorToastr } = useToastr();
 
   const [deviceUsers, setDeviceUsers] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
@@ -53,10 +54,11 @@ const Home = () => {
     );
   }
 
-  const handleLoginSuccess = async ({ code }) => {
+  const handleLoginSuccess = async (res) => {
     try {
-      await createGoogleTokens(code);
+      await createGoogleTokens('code');
       setIsCalendarAccessGranted(true);
+      showSuccessToastr('Calendar access allowed successfully.');
     } catch (error) {
       showErrorToastr(error?.message || 'Error allowing access of the calendar. Please try again.');
     }
@@ -92,17 +94,17 @@ const Home = () => {
             <ActionButton action={USER_ACTIONS.PUT_WASHED_CLOTH} />
             <ActionButton action={USER_ACTIONS.PUT_UNWASHED_CLOTH} />
             <ActionButton action={USER_ACTIONS.TAKE_CLOTH} />
-
             {!isCalendarAccessGranted && (
               <GoogleLogin
-                clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}
-                buttonText="Grant Calendar Access"
                 onSuccess={handleLoginSuccess}
-                onFailure={handleLoginFailure}
+                onError={handleLoginFailure}
+                useOneTap
                 cookiePolicy="single_host_origin"
-                responseType="code"
-                accessType="offline"
-                scope="openid email profile https://www.googleapis.com/auth/calendar"
+                theme="filled_blue"
+                size="large"
+                shape="square"
+                width="100%"
+                auto_select
               />
             )}
           </Grid>

@@ -4,6 +4,7 @@ import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import CircularProgress from '@mui/material/CircularProgress';
+import { googleLogout } from '@react-oauth/google';
 import { PublicWrapper } from '../../components/layouts';
 import { RoutePaths } from '../../configs';
 import { logoutDevice } from '../../api/Auth';
@@ -14,6 +15,7 @@ const Logout = () => {
 
   useEffect(() => {
     logoutDevice().then(() => {
+      googleLogout();
       window.localStorage.removeItem('isLoggedIn');
       setTimeout(() => {
         history.push(RoutePaths.LOGIN);
