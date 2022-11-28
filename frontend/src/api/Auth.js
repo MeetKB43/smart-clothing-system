@@ -33,3 +33,6 @@ export const logoutDevice = async () => {
   const result = await getApiCall('/logout');
   return result.data;
 };
+
+// eslint-disable-next-line no-unused-vars
+export const createGoogleTokens = async (code) => {};
