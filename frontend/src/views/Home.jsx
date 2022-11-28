@@ -23,7 +23,9 @@ const Home = () => {
   const [suggestionsLoaded, setSuggestionsLoaded] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataLoadError, setDataLoadError] = useState('');
-  const [isCalendarAccessGranted, setIsCalendarAccessGranted] = useState(false);
+  const [isCalendarAccessGranted, setIsCalendarAccessGranted] = useState(
+    localStorage.getItem('isCalendarAccessGranted')
+  );
 
   useEffect(() => {
     setDataLoaded(false);
@@ -57,6 +59,7 @@ const Home = () => {
   const handleLoginSuccess = async (res) => {
     try {
       await createGoogleTokens('code');
+      window.localStorage.setItem('isCalendarAccessGranted', true);
       setIsCalendarAccessGranted(true);
       showSuccessToastr('Calendar access allowed successfully.');
     } catch (error) {

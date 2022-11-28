@@ -16,6 +16,7 @@ const Logout = () => {
   useEffect(() => {
     logoutDevice().then(() => {
       googleLogout();
+      window.localStorage.removeItem('isCalendarAccessGranted');
       window.localStorage.removeItem('isLoggedIn');
       setTimeout(() => {
         history.push(RoutePaths.LOGIN);
