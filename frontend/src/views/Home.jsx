@@ -1,8 +1,7 @@
-/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
 import { CircularProgress, Box, Grid, Button } from '@mui/material';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { PrivateWrapper } from '../components/layouts';
 import useToastr from '../hooks/useToastr';
 import Notifications from '../components/home/Suggestions';
@@ -26,6 +25,22 @@ const Home = () => {
   const [isCalendarAccessGranted, setIsCalendarAccessGranted] = useState(
     localStorage.getItem('isCalendarAccessGranted')
   );
+
+  const login = useGoogleLogin({
+    onSuccess: async ({ code }) => {
+      try {
+        await createGoogleTokens(code);
+        window.localStorage.setItem('isCalendarAccessGranted', true);
+        setIsCalendarAccessGranted(true);
+        showSuccessToastr('Calendar access allowed successfully.');
+      } catch (error) {
+        showErrorToastr(
+          error?.message || 'Error allowing access of the calendar. Please try again.'
+        );
+      }
+    },
+    flow: 'auth-code',
+  });
 
   useEffect(() => {
     setDataLoaded(false);
@@ -56,19 +71,6 @@ const Home = () => {
     );
   }
 
-  const handleLoginSuccess = async (res) => {
-    try {
-      await createGoogleTokens('code');
-      window.localStorage.setItem('isCalendarAccessGranted', true);
-      setIsCalendarAccessGranted(true);
-      showSuccessToastr('Calendar access allowed successfully.');
-    } catch (error) {
-      showErrorToastr(error?.message || 'Error allowing access of the calendar. Please try again.');
-    }
-  };
-
-  const handleLoginFailure = () => {};
-
   return (
     <PrivateWrapper pageName={pageName}>
       <Grid container sx={{ mt: 2 }} spacing={3}>
@@ -98,17 +100,21 @@ const Home = () => {
             <ActionButton action={USER_ACTIONS.PUT_UNWASHED_CLOTH} />
             <ActionButton action={USER_ACTIONS.TAKE_CLOTH} />
             {!isCalendarAccessGranted && (
-              <GoogleLogin
-                onSuccess={handleLoginSuccess}
-                onError={handleLoginFailure}
-                useOneTap
-                cookiePolicy="single_host_origin"
-                theme="filled_blue"
-                size="large"
-                shape="square"
-                width="100%"
-                auto_select
-              />
+              <Button
+                color="primary"
+                variant="contained"
+                sx={{
+                  width: '100%',
+                  p: 1,
+                  py: 3,
+                  fontSize: 16,
+                  borderRadius: 1,
+                  mb: 1,
+                }}
+                onClick={login}
+              >
+                Grant calendar access
+              </Button>
             )}
           </Grid>
         </Grid>

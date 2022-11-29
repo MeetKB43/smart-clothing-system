@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -87,7 +86,6 @@ const UserInventory = ({ match }) => {
             <Button
               variant="contained"
               color="primary"
-              startIcon={<AddIcon />}
               className={classes.addNewBtn}
               onClick={() => showUserActionDialog(USER_ACTIONS.PUT_WASHED_CLOTH)}
             >
@@ -96,7 +94,6 @@ const UserInventory = ({ match }) => {
             <Button
               variant="contained"
               color="primary"
-              startIcon={<AddIcon />}
               className={classes.addNewBtn}
               onClick={() => showUserActionDialog(USER_ACTIONS.PUT_UNWASHED_CLOTH)}
             >
@@ -116,7 +113,6 @@ const UserInventory = ({ match }) => {
             <Button
               variant="contained"
               color="primary"
-              startIcon={<AddIcon />}
               className={classes.addNewBtn}
               onClick={() => setShowClothForm(!showClothForm)}
             >
