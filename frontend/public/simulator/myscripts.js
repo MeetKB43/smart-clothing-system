@@ -161,6 +161,7 @@ function onMouseMove(e) {
       currentEle.ele.style.backgroundImage = `url("./images/${currentEle.urlF}")`;
       currentEle.ele.style.width = `${60}px`;
       currentEle.ele.style.height = `${20}px`;
+      currentEle.ele.style.backgroundSize = '100% 100%';
       currentEle.position = Position.ScannedGoingIn;
       sendRequest(currentEle.rfid);
     }
@@ -169,6 +170,7 @@ function onMouseMove(e) {
       currentEle.ele.style.backgroundImage = `url("./images/${currentEle.url}")`;
       currentEle.ele.style.width = `${currentEle.width}px`;
       currentEle.ele.style.height = `${currentEle.height}px`;
+      currentEle.ele.style.backgroundSize = 'contain';
       currentEle.position = Position.ScannedGoingOut;
       sendRequest(currentEle.rfid);
     }
@@ -274,32 +276,26 @@ lstObj.push(
   )
 );
 lstObj.push(
-  CreateClothObject(
-    'Tshirt3',
-    'Tshirt3.jpeg',
-    'Tshirt3F.png',
-    100,
-    200,
-    'tShirt',
-    1,
-    Position.IsOut,
-    13
-  )
-);
-lstObj.push(
-  CreateClothObject(
-    'Tshirt4',
-    'Tshirt4.jpeg',
-    'Tshirt4F.png',
-    100,
-    200,
-    'tShirt',
-    1,
-    Position.IsOut,
-    14
-  )
+  CreateClothObject('jeans', 'jeans.webp', 'jeansF.webp', 100, 200, 'jeans', 1, Position.IsOut, 6)
 );
 
+lstObj.push(
+  CreateClothObject('boxer', 'boxer.jpg', 'boxerF.jpg', 100, 200, 'boxer', 1, Position.IsOut, 8)
+);
+
+lstObj.push(
+  CreateClothObject(
+    'shorts',
+    'shorts.webp',
+    'shortsF.jpg',
+    100,
+    200,
+    'shorts',
+    1,
+    Position.IsOut,
+    9
+  )
+);
 // create objects from data array
 for (let i = 0; i < lstObj.length; i++) {
   let ele;
