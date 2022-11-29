@@ -850,7 +850,7 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Meeting"]) {
       Notification.push({
         title: "Meeting clothing Suggestion",
-        Body:
+        body:
           username + " has not enough formal shirts to wear for each meetings",
       });
     }
@@ -861,7 +861,7 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Meeting"]) {
       Notification.push({
         title: "Meeting clothing Suggestion",
-        Body:
+        body:
           username +
           " has not enough formal trousers to wear for each meetings",
       });
@@ -873,7 +873,7 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Party"]) {
       Notification.push({
         title: "Party clothing Suggestion",
-        Body: username + " has not enough blazers to wear for upcoming parties",
+        body: username + " has not enough blazers to wear for upcoming parties",
       });
     }
 
@@ -883,7 +883,7 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Gym"]) {
       Notification.push({
         title: "Gym clothing Suggestion",
-        Body: username + " has not enough sport T-shirts to wear to Gym",
+        body: username + " has not enough sport T-shirts to wear to Gym",
       });
     }
 
@@ -893,7 +893,7 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Social"]) {
       Notification.push({
         title: "Social event clothing Suggestion",
-        Body:
+        body:
           username +
           " has not enough casual clothes to wear for upcoming social events",
       });

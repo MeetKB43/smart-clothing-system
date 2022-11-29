@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
 import { CircularProgress, Box, Grid, Button, Card, Typography, lighten } from '@mui/material';
-import { useGoogleLogin } from '@react-oauth/google';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { ArrowRightAltOutlined } from '@mui/icons-material';
 import { useHistory } from 'react-router-dom';
@@ -11,7 +10,7 @@ import Notifications from '../components/home/Suggestions';
 import { RoutePaths, USER_ACTIONS } from '../configs';
 import ActionButton from '../components/home/ActionButton';
 import { getOverview } from '../api/Clothes';
-import { createGoogleTokens } from '../api/Auth';
+
 import bannerImage from '../assets/images/welcome-banner.svg';
 
 const DEVICE_ID = new uuid.DeviceUUID().get();
@@ -19,7 +18,7 @@ const DEVICE_ID = new uuid.DeviceUUID().get();
 const Home = () => {
   const pageName = 'Home';
   const history = useHistory();
-  const { showSuccessToastr, showErrorToastr } = useToastr();
+  const { showErrorToastr } = useToastr();
 
   const [suggestions, setSuggestions] = useState([]);
 
@@ -27,26 +26,6 @@ const Home = () => {
   const [suggestionsLoaded, setSuggestionsLoaded] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataLoadError, setDataLoadError] = useState('');
-  const [isCalendarAccessGranted, setIsCalendarAccessGranted] = useState(
-    localStorage.getItem('isCalendarAccessGranted')
-  );
-
-  const login = useGoogleLogin({
-    onSuccess: async ({ code }) => {
-      try {
-        await createGoogleTokens(code, DEVICE_ID);
-        window.localStorage.setItem('isCalendarAccessGranted', true);
-        setIsCalendarAccessGranted(true);
-        showSuccessToastr('Calendar access allowed successfully.');
-      } catch (error) {
-        showErrorToastr(
-          error?.message || 'Error allowing access of the calendar. Please try again.'
-        );
-      }
-    },
-    flow: 'auth-code',
-    //   scope: 'openid email profile https://www.googleapis.com/auth/calendar',
-  });
 
   useEffect(() => {
     setDataLoaded(false);
@@ -128,23 +107,6 @@ const Home = () => {
           <Grid item xs={12}>
             <ActionButton action={USER_ACTIONS.PUT_WASHED_CLOTH} />
             <ActionButton action={USER_ACTIONS.PUT_UNWASHED_CLOTH} />
-            {!isCalendarAccessGranted && (
-              <Button
-                color="primary"
-                variant="contained"
-                sx={{
-                  width: '100%',
-                  p: 1,
-                  py: 3,
-                  fontSize: 16,
-                  borderRadius: 1,
-                  mb: 1,
-                }}
-                onClick={login}
-              >
-                Grant calendar access
-              </Button>
-            )}
           </Grid>
         </Grid>
       </Grid>

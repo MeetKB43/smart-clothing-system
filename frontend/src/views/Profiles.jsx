@@ -54,11 +54,6 @@ const Profiles = () => {
       });
   }, [reloadRows, activePage]);
 
-  // const searchList = () => {
-  //   setActivePage(1);
-  //   setReloadRows(!reloadRows);
-  // };
-
   const deleteRecord = () => {
     deleteProfile(selectedProfile)
       .then(() => {
@@ -77,27 +72,7 @@ const Profiles = () => {
     <PrivateWrapper pageName={pageName}>
       <>
         <div className={classes.filterToolbar}>
-          <div className={classes.filterLeft}>
-            {/* <TextField
-              name="search"
-              id="search"
-              label="Search"
-              className={classes.searchInput}
-              onChange={(e) => {
-                setSearchText(e.target.value);
-                searchList();
-              }}
-              value={searchText}
-            />
-            <Button
-              variant="contained"
-              className={classes.searchFilterBtn}
-              onClick={() => setReloadRows(!reloadRows)}
-            >
-              Refresh
-            </Button> 
-            */}
-          </div>
+          <div className={classes.filterLeft} />
           <div className={classes.filterRight}>
             <Button
               variant="contained"
