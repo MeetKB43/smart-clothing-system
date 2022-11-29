@@ -1,89 +1,88 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import Proptypes from 'prop-types';
-import { Card, Divider, CardContent, Typography, Button } from '@mui/material';
-import ListItemText from '@mui/material/ListItemText';
+import { Card, Typography, Button } from '@mui/material';
 import Box from '@mui/material/Box';
+import Chart from 'react-apexcharts';
+import fallbackAvatar from '../../assets/images/fallback_avatar.jpg';
+import maleAvatar from '../../assets/images/avatar_male.jpg';
+import femaleAvatar from '../../assets/images/avatar_female.jpg';
 
-const InventoryInfoCard = ({ heading, totalClothes, washedClothes, unwashedClothes, link }) => {
+const getAvatarSrc = (gender) => {
+  switch (gender) {
+    case 'Female':
+      return femaleAvatar;
+    case 'Male':
+      return maleAvatar;
+    default:
+      return fallbackAvatar;
+  }
+};
+const InventoryInfoCard = ({
+  heading,
+  gender,
+  totalClothes,
+  washedClothes,
+  unwashedClothes,
+  link,
+}) => {
   const history = useHistory();
 
   return (
-    <Card
-      elevation={8}
-      onClick={() => history.push(link)}
-      component={Button}
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-    >
-      <CardContent style={{ paddingBottom: 0 }}>
-        <Typography variant="h6" component="h3" gutterBottom>
-          {heading.split(' ')[0] ? heading.split(' ')[0] : heading}
-        </Typography>
-      </CardContent>
-      <CardContent style={{ flexGrow: 1, p: 0, m: 0 }}>
-        <Box display="flex">
-          <Box sx={{ mr: 3 }}>
-            <ListItemText
-              sx={{ p: 0, m: 0 }}
-              primary={
-                <Typography sx={{ p: 0, m: 0, fontSize: 18 }} variant="h6" component="div">
-                  Total Clothes
-                </Typography>
-              }
-              secondary={
-                <Typography sx={{ p: 0, m: 0, fontSize: 16 }} variant="body" component="div">
-                  {totalClothes}
-                </Typography>
-              }
-            />
-          </Box>
-          <Divider />
-          <Box sx={{ mr: 3 }}>
-            <ListItemText
-              sx={{ p: 0, m: 0 }}
-              primary={
-                <Typography sx={{ p: 0, m: 0, fontSize: 18 }} variant="h6" component="div">
-                  Washed Clothes
-                </Typography>
-              }
-              secondary={
-                <Typography sx={{ p: 0, m: 0, fontSize: 16 }} variant="body" component="div">
-                  {washedClothes}
-                </Typography>
-              }
-            />
-          </Box>
-          <Divider />
-          <Box sx={{ mr: 3 }}>
-            <ListItemText
-              sx={{ p: 0, m: 0 }}
-              primary={
-                <Typography sx={{ p: 0, m: 0, fontSize: 18 }} variant="h6" component="div">
-                  Unwashed Clothes
-                </Typography>
-              }
-              secondary={
-                <Typography sx={{ p: 0, m: 0, fontSize: 16 }} variant="body" component="div">
-                  {unwashedClothes}
-                </Typography>
-              }
-            />
-          </Box>
-          <Divider />
-        </Box>
-        <Box sx={{ mt: 3 }}>
-          <Typography sx={{ p: 0, m: 0 }} variant="body" component="div">
-            You have {Math.ceil((washedClothes / totalClothes) * 100) || 0} % of washed clothes to
-            wear in your closet.
+    <Card component={Button} elevation={2} sx={{ p: 2 }} onClick={() => history.push(link)}>
+      <Box>
+        <Box display="flex" flexDirection="row" alignItems="center">
+          <img
+            src={getAvatarSrc(gender)}
+            alt="user_avatar"
+            style={{
+              width: '38px',
+              height: '38px',
+              marginRight: '8px',
+              padding: '4px',
+              borderRadius: '50%',
+              color: 'rgb(54, 179, 126)',
+              backgroundColor: 'rgba(54, 179, 126, 0.16)',
+            }}
+          />
+          <Typography variant="subtitle1" sx={{ textTransform: 'capitalize' }}>
+            {heading}
           </Typography>
         </Box>
-      </CardContent>
+
+        <Chart
+          options={{
+            chart: { type: 'donut' },
+            labels: ['Washed Clothes', 'Unwased Clothes'],
+            responsive: [
+              {
+                breakpoint: 480,
+                options: {
+                  chart: {
+                    width: 150,
+                  },
+                  legend: {
+                    position: 'bottom',
+                  },
+                },
+              },
+            ],
+          }}
+          series={[
+            Math.ceil((washedClothes / totalClothes) * 100),
+            Math.ceil((unwashedClothes / totalClothes) * 100),
+          ]}
+          type="donut"
+          width="380"
+        />
+      </Box>
     </Card>
   );
 };
 
 InventoryInfoCard.propTypes = {
   heading: Proptypes.string.isRequired,
+  gender: Proptypes.string.isRequired,
   totalClothes: Proptypes.string.isRequired,
   washedClothes: Proptypes.string.isRequired,
   unwashedClothes: Proptypes.string.isRequired,

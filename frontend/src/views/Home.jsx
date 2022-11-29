@@ -80,6 +80,7 @@ const Home = () => {
               <Grid key={r.username} item xs={12} md={6}>
                 <InventoryInfoCard
                   heading={r.username}
+                  gender={r?.gender || ''}
                   totalClothes={r['Unwashed cloths'] + r['Washed cloths'] || '0'}
                   washedClothes={r['Washed cloths'] || '0'}
                   unwashedClothes={r['Unwashed cloths'] || '0'}
