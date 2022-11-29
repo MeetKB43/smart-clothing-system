@@ -28,9 +28,9 @@ const ManageProfileForm = ({ editId, closeDialog }) => {
         username: `${data.firstName} ${data.lastName}`,
         firstname: data.firstName,
         lastname: data.lastName,
-        //  pin: data.pin,
         age: data.age,
         gender: data.gender,
+        email: data.email,
         city: data.city,
       };
       await addProfile(toSubmitData);
@@ -99,6 +99,29 @@ const ManageProfileForm = ({ editId, closeDialog }) => {
             <Grid item xs={12}>
               <Controller
                 control={control}
+                id="email"
+                name="email"
+                rules={{ ...Validations.EMAIL_REQUIRED }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <TextField
+                    required
+                    id="email"
+                    name="email"
+                    label="Email Address"
+                    fullWidth
+                    variant="standard"
+                    type="email"
+                    value={value}
+                    onChange={onChange}
+                    error={!!error}
+                    helperText={error ? error?.message : null}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12}>
+              <Controller
+                control={control}
                 id="city"
                 name="city"
                 rules={{ ...Validations.REQUIRED }}
@@ -131,43 +154,6 @@ const ManageProfileForm = ({ editId, closeDialog }) => {
                     id="age"
                     name="age"
                     label="Age"
-                    fullWidth
-                    variant="standard"
-                    type="number"
-                    value={value}
-                    onChange={onChange}
-                    error={!!error}
-                    helperText={error ? error?.message : null}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Controller
-                control={control}
-                id="pin"
-                name="pin"
-                rules={{
-                  ...Validations.REQUIRED,
-                  ...{
-                    maxLength: {
-                      value: 4,
-                      message: `Value must be  equal to 4 characters.`,
-                    },
-                  },
-                  ...{
-                    minLength: {
-                      value: 4,
-                      message: `Value must be  equal to 4 characters.`,
-                    },
-                  },
-                }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
-                  <TextField
-                    required
-                    id="pin"
-                    name="pin"
-                    label="Pin"
                     fullWidth
                     variant="standard"
                     type="number"

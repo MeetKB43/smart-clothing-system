@@ -3,7 +3,6 @@ import { makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
 import AddIcon from '@mui/icons-material/Add';
 import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -38,10 +37,7 @@ const Profiles = () => {
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showConfirmDeleteDialog, setShowConfirmDeleteDialog] = useState(false);
 
-  const columns = [
-    { name: 'Name', id: 'name', width: '40%' },
-    { name: 'Clothes', id: 'totalClothes', width: '40%', align: 'right' },
-  ];
+  const columns = [{ name: 'Name', id: 'name', width: '40%' }];
 
   useEffect(() => {
     setDataLoaded(false);
@@ -144,7 +140,7 @@ const Profiles = () => {
                 rows.map((row) => (
                   <TableRow key={`profile-${row.id}`}>
                     <TableCell>{row.name}</TableCell>
-                    <TableCell align="right">{row.totalClothes}</TableCell>
+
                     <TableCell align="right">
                       <IconButton
                         aria-label="delete"
@@ -155,16 +151,6 @@ const Profiles = () => {
                         }}
                       >
                         <DeleteIcon fontSize="small" color="error" />
-                      </IconButton>
-                      <IconButton
-                        aria-label="edit"
-                        className={classes.deleteBtn}
-                        onClick={() => {
-                          setShowProfileForm(true);
-                          setSelectedProfile(row.uID);
-                        }}
-                      >
-                        <EditIcon fontSize="small" />
                       </IconButton>
                     </TableCell>
                   </TableRow>
