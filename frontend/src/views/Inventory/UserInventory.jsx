@@ -98,14 +98,6 @@ const UserInventory = ({ match }) => {
             >
               Add Unwashed Clothes
             </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              className={classes.addNewBtn}
-              onClick={() => showUserActionDialog(USER_ACTIONS.TAKE_CLOTH)}
-            >
-              Take Clothes
-            </Button>
           </div>
           <div className={classes.filterRight}>
             <Button

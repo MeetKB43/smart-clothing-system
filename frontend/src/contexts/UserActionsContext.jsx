@@ -7,6 +7,7 @@ import {
   getSubCategoryName,
   LAUNDRY_STATE,
   RFID_PACKET_TYPE,
+  RoutePaths,
   USER_ACTIONS,
 } from '../configs';
 import UserActionsDialog from '../components/inventory/UserActionsDialog';
@@ -25,7 +26,7 @@ export const UserActionsProvider = ({ children }) => {
   const { showSuccessToastr, showErrorToastr } = useToastr();
   const [isOpen, setIsOpen] = useState(false);
   const [action, setAction] = useState(USER_ACTIONS.NA_ACTION_DETECTED);
-  const [takenClothes, setTakenClothes] = useState(0);
+
   const [detectedClothes, setDetectedClothes] = useState([]);
   const [openManageLaundryStateDialog, setOpenManageLaundryStateDialog] = useState(false);
 
@@ -54,24 +55,6 @@ export const UserActionsProvider = ({ children }) => {
       if (d?.pkt_Type === RFID_PACKET_TYPE.TAKE_CLOTH) {
         // incase of multiple clothes taken from the closet, show appropiate number of clothes till 1min
         showSuccessToastr('Cloth has been taken from the closet.');
-        setTakenClothes((ps) => ps + 1);
-        setDetectedClothes((ps) => {
-          const arrCpy = [...ps];
-
-          arrCpy.push({
-            RFID: d?.RFID,
-            deviceID: DEVICE_ID,
-            category: getCategoryName(d?.cType),
-            subCategory: getSubCategoryName(d?.cType, d?.cSubType),
-          });
-
-          return arrCpy;
-        });
-        // Remove taken cloth buffer value after 1min
-        setTimeout(() => {
-          setTakenClothes(0);
-          setDetectedClothes([]);
-        }, 1000);
       }
 
       if (d?.pkt_Type === RFID_PACKET_TYPE.PUT_CLOTH) {
@@ -103,7 +86,7 @@ export const UserActionsProvider = ({ children }) => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [takenClothes, detectedClothes, action]);
+  }, [detectedClothes, action]);
 
   const submitWashedClothInfo = async () => {
     try {
@@ -111,12 +94,14 @@ export const UserActionsProvider = ({ children }) => {
       showSuccessToastr('Clothes information updated successfully.');
       setDetectedClothes([]);
       closeDialog();
+      window.location.assign(RoutePaths.INVENTORY);
     } catch ({ response }) {
       showErrorToastr(
         response?.message ||
           response?.toString() ||
           'Error saving clothes information. Please scan again and confirm.'
       );
+      window.location.assign(RoutePaths.INVENTORY);
     }
   };
 
@@ -141,6 +126,7 @@ export const UserActionsProvider = ({ children }) => {
         open={openManageLaundryStateDialog}
         closeDialog={() => {
           setOpenManageLaundryStateDialog(false);
+          setDetectedClothes([]);
         }}
         onConfirm={() => {
           setOpenManageLaundryStateDialog(false);

@@ -11,13 +11,12 @@ import TableContainer from '@mui/material/TableContainer';
 import TableRow from '@mui/material/TableRow';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import CloseIcon from '@mui/icons-material/Close';
 import Slide from '@mui/material/Slide';
 import CheckBox from '@mui/material/CheckBox';
 import { saveClothesInfo } from '../../api/Clothes';
 import useToastr from '../../hooks/useToastr';
+import { RoutePaths } from '../../configs';
 
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
@@ -82,8 +81,10 @@ const ManageLaundryState = ({ closeDialog, open, detectedClothes, onConfirm }) =
       onConfirm();
       setFinalClothData([]);
       closeDialog();
+      window.location.assign(RoutePaths.INVENTORY);
     } catch ({ response }) {
       setFinalClothData([]);
+      window.location.assign(RoutePaths.INVENTORY);
       showErrorToastr(
         response?.message ||
           response?.toString() ||
@@ -94,12 +95,17 @@ const ManageLaundryState = ({ closeDialog, open, detectedClothes, onConfirm }) =
 
   return (
     <div>
-      <Dialog open={open} fullScreen onClose={closeDialog} TransitionComponent={Transition}>
+      <Dialog
+        open={open}
+        fullScreen
+        onClose={() => {
+          setFinalClothData([]);
+          closeDialog();
+        }}
+        TransitionComponent={Transition}
+      >
         <AppBar sx={{ position: 'relative' }}>
           <Toolbar>
-            <IconButton edge="start" color="inherit" onClick={closeDialog} aria-label="close">
-              <CloseIcon />
-            </IconButton>
             <Typography sx={{ ml: 2, flex: 1 }} variant="h6" component="div">
               Detected Clothes
             </Typography>

@@ -670,7 +670,7 @@ app.post("/dashboard", async function (req, res) {
     city: "windsor",
     "Min. Temp.": 2.8,
     "Max. Temp.": 6.1,
-    "Min. feels like": 0.6,
+    "Min. feels like": 5,
     "Max. feels like": 7.8,
     Day: {
       Precipitation: false,

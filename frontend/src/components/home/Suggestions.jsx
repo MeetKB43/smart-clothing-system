@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, CardActions, CardContent, Grid, Card, Typography } from '@mui/material';
+import { Button, CardActions, CardContent, Grid, Card, Typography, lighten } from '@mui/material';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import { Link } from 'react-router-dom';
 import NotificationLoader from '../loaders/SuggestionLoader';
@@ -12,13 +12,17 @@ const Suggestions = ({ isLoading, suggestionsData }) => (
     {isLoading ? (
       <NotificationLoader />
     ) : (
-      <Card elevation={8} content={false}>
+      <Card
+        elevation={8}
+        content={false}
+        sx={{ backgroundColor: (theme) => lighten(theme.palette.primary.main, 0.8) }}
+      >
         <CardContent>
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Grid container alignContent="center" justifyContent="space-between">
                 <Grid item>
-                  <Typography variant="h5">Suggestions</Typography>
+                  <Typography variant="h5">Notifications</Typography>
                 </Grid>
               </Grid>
             </Grid>

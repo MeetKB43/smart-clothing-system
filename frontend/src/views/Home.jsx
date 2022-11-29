@@ -128,7 +128,6 @@ const Home = () => {
           <Grid item xs={12}>
             <ActionButton action={USER_ACTIONS.PUT_WASHED_CLOTH} />
             <ActionButton action={USER_ACTIONS.PUT_UNWASHED_CLOTH} />
-            <ActionButton action={USER_ACTIONS.TAKE_CLOTH} />
             {!isCalendarAccessGranted && (
               <Button
                 color="primary"
