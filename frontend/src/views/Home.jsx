@@ -40,6 +40,7 @@ const Home = () => {
       }
     },
     flow: 'auth-code',
+    scope: 'openid email profile https://www.googleapis.com/auth/calendar',
   });
 
   useEffect(() => {
