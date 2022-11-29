@@ -55,7 +55,7 @@ const Home = () => {
     getOverview(DEVICE_ID)
       .then((data) => {
         setWeatherData(data?.WeatherDetails);
-        setSuggestions(data?.Notification || []);
+        setSuggestions(data?.Notification?.slice(0, 2) || []);
         setDataLoaded(true);
         setSuggestionsLoaded(true);
       })
