@@ -11,7 +11,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { IconButton, Pagination } from '@mui/material';
 import * as uuid from 'device-uuid';
-import SwipeUpAltIcon from '@mui/icons-material/SwipeUpAlt';
 import { PrivateWrapper } from '../../components/layouts';
 import TableListing from '../../ui/styles/views/TableListing';
 import { ConfirmDialog, TableLoader } from '../../components/common';
@@ -102,7 +101,6 @@ const UserInventory = ({ match }) => {
             <Button
               variant="contained"
               color="primary"
-              startIcon={<SwipeUpAltIcon />}
               className={classes.addNewBtn}
               onClick={() => showUserActionDialog(USER_ACTIONS.TAKE_CLOTH)}
             >
