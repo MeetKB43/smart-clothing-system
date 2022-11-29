@@ -20,4 +20,9 @@ export const getOverview = async (deviceID) => {
   return result.data;
 };
 
+export const saveClothesInfo = async (clothesData) => {
+  const result = await postApiCall('/update-cloth-laundry-info', { clothesData });
+  return result.data;
+};
+
 export const deleteCloth = async () => {};

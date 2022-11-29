@@ -12,6 +12,7 @@ import {
 import UserActionsDialog from '../components/inventory/UserActionsDialog';
 import useToastr from '../hooks/useToastr';
 import { saveWashedClothesInfo } from '../api/Clothes';
+import ManageLaundryState from '../components/inventory/ManageLaundryState';
 
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
@@ -26,6 +27,7 @@ export const UserActionsProvider = ({ children }) => {
   const [action, setAction] = useState(USER_ACTIONS.NA_ACTION_DETECTED);
   const [takenClothes, setTakenClothes] = useState(0);
   const [detectedClothes, setDetectedClothes] = useState([]);
+  const [openManageLaundryStateDialog, setOpenManageLaundryStateDialog] = useState(false);
 
   const closeDialog = () => {
     setDetectedClothes([]);
@@ -74,6 +76,9 @@ export const UserActionsProvider = ({ children }) => {
 
       if (d?.pkt_Type === RFID_PACKET_TYPE.PUT_CLOTH) {
         let laundryState = LAUNDRY_STATE.NA;
+        if (action === USER_ACTIONS.NA_ACTION_DETECTED) {
+          setOpenManageLaundryStateDialog(true);
+        }
         if (action === USER_ACTIONS.PUT_WASHED_CLOTH) laundryState = LAUNDRY_STATE.WASHED;
         if (action === USER_ACTIONS.PUT_UNWASHED_CLOTH) laundryState = LAUNDRY_STATE.UNWASHED;
 
@@ -130,6 +135,17 @@ export const UserActionsProvider = ({ children }) => {
         action={action}
         closeDialog={closeDialog}
         onConfirm={action === USER_ACTIONS.PUT_WASHED_CLOTH ? submitWashedClothInfo : closeDialog}
+        detectedClothes={detectedClothes}
+      />
+      <ManageLaundryState
+        open={openManageLaundryStateDialog}
+        closeDialog={() => {
+          setOpenManageLaundryStateDialog(false);
+        }}
+        onConfirm={() => {
+          setOpenManageLaundryStateDialog(false);
+          setDetectedClothes([]);
+        }}
         detectedClothes={detectedClothes}
       />
     </>

@@ -239,7 +239,7 @@ app.post('/login', function (req, res) {
             if (result[0]['pin'] == pin) {
                 var sessionToken = uuid.v4()
                 var now = new Date()
-                var expiresAt = new Date(+now + 1200 * 1000)
+                var expiresAt = new Date(+now + 864000000)
                 var uID = result[0]['uID']
                 const session = new Session(uID, expiresAt)
                 sessions[sessionToken] = session
@@ -337,13 +337,15 @@ app.post('/cloth_scanned', async function (req, res) {
             sql = "UPDATE inventory SET availableInCloset = 0 WHERE RFID = ? AND deviceID = ?"
             result2 = await query(sql, [RFID, deviceID])
             c1 = new Scanned_Cloth("take_cloth", 2, RFID, deviceID);
-            io.to(socket_devices[deviceID]).emit('RFID scanned', c1) //0: new cloth, 1: put cloth, 2: take cloth
+            io.to(socket_devices[deviceID]).emit('RFID scanned', { ...result[0],
+                ...c1}) //0: new cloth, 1: put cloth, 2: take cloth
         }
         else {
             sql = "UPDATE inventory SET availableInCloset = 1, used = ? WHERE RFID = ? AND deviceID = ?"
             await query(sql, [1, RFID, deviceID])
             c1 = new Scanned_Cloth("put_cloth", 1, RFID, deviceID);
-            io.to(socket_devices[deviceID]).emit('RFID scanned', c1) //0: new cloth, 1: put cloth, 2: take cloth
+            io.to(socket_devices[deviceID]).emit('RFID scanned', { ...result[0],
+                ...c1}) //0: new cloth, 1: put cloth, 2: take cloth
         }
     }
     else {
@@ -467,6 +469,24 @@ app.post('/add_cloths', async function (req, res) {
     }
     res.status(200).send("Cloths added into inventory");
 })
+
+
+app.post('/update-cloth-laundry-info', async function (req, res) {
+    if (!validate_session(req)) {
+        res.status(401).send('Invalid Session')
+        return
+    }
+    const clothesData = req.body.clothesData;
+    console.log(clothesData);
+    for (i = 0; i < clothesData.length; i++) {
+        sql = "UPDATE inventory SET used = ? WHERE RFID = ? AND deviceID = ?"
+        con.query(sql, [clothesData[i].isWashed?0:1,clothesData[i].RFID,clothesData[i].deviceID], function (err, result) {
+            if (err) { throw err }
+        })
+    }
+    res.status(200).send("Cloths added into inventory");
+})
+
 
 app.post('/display_users', function (req, res) {
     if (!validate_session(req)) {
