@@ -1,4 +1,20 @@
 import RoutePaths from './Routes';
+import blazer from '../assets/images/blazer.png';
+import bottomWear from '../assets/images/bottom_wear.png';
+import casualShirt from '../assets/images/casual_shirt.png';
+import formalShirt from '../assets/images/formal_shirt.png';
+import innerWear from '../assets/images/inner_wear.png';
+import jacket from '../assets/images/jacket.png';
+import joggers from '../assets/images/joggers.png';
+import topWear from '../assets/images/top_wear.png';
+import tshirt from '../assets/images/t_shirt.png';
+import trousers from '../assets/images/trousers.png';
+import sweaters from '../assets/images/sweaters.png';
+import skirt from '../assets/images/skirt.png';
+import sportsWear from '../assets/images/sport_wear.png';
+import suit from '../assets/images/suit.png';
+import shorts from '../assets/images/shorts.png';
+import innerShorts from '../assets/images/inner_shorts.png';
 
 export const NAV_DRAWER_WIDTH = 256;
 export const APP_BAR_HEIGHT = 56;
@@ -21,37 +37,46 @@ export const ClothCategories = [
   {
     name: 'Top Wear',
     id: 1,
+    image: topWear,
     subCategories: [
       {
         name: 'T-shirt',
+        image: tshirt,
         id: 1,
       },
       {
         name: 'Casual shirt',
+        image: casualShirt,
         id: 2,
       },
       {
         name: 'Formal shirt',
+        image: formalShirt,
         id: 3,
       },
       {
         name: 'Sweaters',
+        image: sweaters,
         id: 4,
       },
       {
         name: 'Jacket',
+        image: jacket,
         id: 5,
       },
       {
         name: 'Blazer & Coats',
+        image: blazer,
         id: 6,
       },
       {
         name: 'Suits',
+        image: suit,
         id: 7,
       },
       {
         name: 'Skirts',
+        image: skirt,
         id: 8,
       },
     ],
@@ -59,25 +84,31 @@ export const ClothCategories = [
   {
     name: 'Bottom Wear',
     id: 2,
+    image: bottomWear,
     subCategories: [
       {
         name: 'Jeans',
+        image: bottomWear,
         id: 9,
       },
       {
         name: 'Casual Trousers',
+        image: trousers,
         id: 10,
       },
       {
         name: 'Formal Trousers',
+        image: trousers,
         id: 11,
       },
       {
         name: 'Shorts',
+        image: shorts,
         id: 12,
       },
       {
         name: 'Track pants & Joggers',
+        image: joggers,
         id: 13,
       },
     ],
@@ -85,25 +116,31 @@ export const ClothCategories = [
   {
     name: 'Innerwear & Sleepwear',
     id: 3,
+    image: innerWear,
     subCategories: [
       {
         name: 'Briefs & Trunks',
+        image: innerWear,
         id: 14,
       },
       {
         name: 'Boxers',
+        image: innerShorts,
         id: 15,
       },
       {
         name: 'Vests',
+        image: innerWear,
         id: 16,
       },
       {
         name: 'Sleepwear & Loungewear',
+        image: innerWear,
         id: 17,
       },
       {
         name: 'Thermals',
+        image: innerWear,
         id: 18,
       },
     ],
@@ -111,17 +148,21 @@ export const ClothCategories = [
   {
     name: 'Sports & Active wear',
     id: 4,
+    image: sportsWear,
     subCategories: [
       {
         name: 'Active t-shirts',
+        image: sportsWear,
         id: 19,
       },
       {
         name: 'Trackpants',
+        image: sportsWear,
         id: 20,
       },
       {
         name: 'Swimwear',
+        image: sportsWear,
         id: 21,
       },
     ],

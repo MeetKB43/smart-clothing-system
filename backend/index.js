@@ -51,7 +51,7 @@ const corsOptions = {
     credentials: true,
 };
 app.use(cors(corsOptions));
-app.options('*', cors());
+
 
 // for parsing application/json
 app.use(bodyParser.json());
@@ -337,13 +337,15 @@ app.post('/cloth_scanned', async function (req, res) {
             sql = "UPDATE inventory SET availableInCloset = 0 WHERE RFID = ? AND deviceID = ?"
             result2 = await query(sql, [RFID, deviceID])
             c1 = new Scanned_Cloth("take_cloth", 2, RFID, deviceID);
-            io.to(socket_devices[deviceID]).emit('RFID scanned', c1) //0: new cloth, 1: put cloth, 2: take cloth
+            io.to(socket_devices[deviceID]).emit('RFID scanned', {  ...result[0],
+                ...c1}) //0: new cloth, 1: put cloth, 2: take cloth
         }
         else {
             sql = "UPDATE inventory SET availableInCloset = 1, used = ? WHERE RFID = ? AND deviceID = ?"
             await query(sql, [1, RFID, deviceID])
             c1 = new Scanned_Cloth("put_cloth", 1, RFID, deviceID);
-            io.to(socket_devices[deviceID]).emit('RFID scanned', c1) //0: new cloth, 1: put cloth, 2: take cloth
+            io.to(socket_devices[deviceID]).emit('RFID scanned', {  ...result[0],
+                ...c1}) //0: new cloth, 1: put cloth, 2: take cloth
         }
     }
     else {

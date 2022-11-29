@@ -9,7 +9,8 @@ import maleAvatar from '../../assets/images/avatar_male.jpg';
 import femaleAvatar from '../../assets/images/avatar_female.jpg';
 
 const getAvatarSrc = (gender) => {
-  switch (gender) {
+  console.log(gender);
+  switch ('Female') {
     case 'Female':
       return femaleAvatar;
     case 'Male':

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Stepper from '@mui/material/Stepper';
@@ -96,7 +97,7 @@ const ClothDataSelection = ({ setActiveStep, dataList, setSelectedData }) => (
             alignItems="center"
           >
             <ListItemAvatar>
-              <Avatar alt="Travis Howard" src="/static/images/avatar/2.jpg" />
+              <Avatar style={{ dropShadow: '5px 0 0 black' }} alt="Travis Howard" src={c.image} />
             </ListItemAvatar>
             <ListItemText primary={c.name} />
           </ListItemButton>
@@ -205,7 +206,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
       socket.emit('connected', DEVICE_ID);
     });
 
-    socket.on('disconnect', () => {});
+    socket.on('disconnect', () => { });
 
     socket.on('RFID scanned', async (d) => {
       if (d?.pkt_Type === RFID_PACKET_TYPE.ADD_NEW_CLOTH) {
