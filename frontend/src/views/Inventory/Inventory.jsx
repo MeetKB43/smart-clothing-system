@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
-import { CircularProgress, Box, Grid, Typography, lighten } from '@mui/material';
-import WarningIcon from '@mui/icons-material/Warning';
+import { CircularProgress, Box, Grid, Typography } from '@mui/material';
 import { PrivateWrapper } from '../../components/layouts';
 import useToastr from '../../hooks/useToastr';
 import { RoutePaths } from '../../configs';
@@ -52,14 +51,13 @@ const InventoryStats = () => {
             display="flex"
             sx={{
               p: 4,
-              backgroundColor: (theme) => lighten(theme.palette.error.main, 0.8),
-              color: (theme) => theme.palette.error.main,
+              // backgroundColor: (theme) => lighten(theme.palette.warning.main, 0.8),
+              // color: (theme) => theme.palette.warning.main,
             }}
             flexDirection="column"
             alignItems="center"
             justifyContent="center"
           >
-            <WarningIcon fontSize="large" />
             <Typography variant="h5">Whoops!</Typography>
             <Typography variant="body">
               It seems like no users has been added into the system. Please create user profile to
@@ -78,6 +76,7 @@ const InventoryStats = () => {
           <Grid key={r.username} item>
             <InventoryInfoCard
               heading={r.username}
+              gender={r?.gender}
               totalClothes={r['Unwashed cloths'] + r['Washed cloths'] || '0'}
               washedClothes={r['Washed cloths'] || '0'}
               unwashedClothes={r['Unwashed cloths'] || '0'}
