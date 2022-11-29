@@ -18,8 +18,9 @@ var accuweather = require('node-accuweather')()('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSO
 const request = require('request');
 dotenv.config();
 const { google } = require('googleapis');
-const calendar = google.calendar('v3');
-const oAuthClient = new google.auth.OAuth2('882011300173-fnt3kjgm3o32j0ukj76bqq1lcs4amueo.apps.googleusercontent.com', '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')
+const { query } = require('express');
+
+const oAuthClient = new google.auth.OAuth2('961222424943-474t0e2iijh1i730cqis7m9sv2639rki.apps.googleusercontent.com', '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', 'http://localhost:4000')
 
 var con = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -268,7 +269,8 @@ app.post('/register_user', function (req, res) {
     var lastname = body['lastname'];
     var age = body['age'];
     var gender = body['gender'];
-    var data = [null, deviceID, username, firstname, lastname, gender, age];
+    var email = body['email'];
+    var data = [null, deviceID, username, firstname, lastname, gender, age, email];
 
     sql = "SELECT * FROM user_profile WHERE username = ?"
     con.query(sql, username, function (err, result) {
@@ -277,7 +279,7 @@ app.post('/register_user', function (req, res) {
             res.status(403).send("User already exist");
         }
         else {
-            sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?)";
+            sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
             con.query(sql, data, function (err, result) {
                 if (err) throw err;
                 res.status(200).send("A new user linked with this device");
@@ -518,6 +520,8 @@ app.post('/dashboard', async function (req, res) {
     for (i = 0; i < result.length; i++) {
         var username = result[i]['username']
         var uID = result[i]['uID']
+        var age = result[i]['age']
+        var gender = result[i]['gender']
         var sql1 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1";
         var sql2 = "SELECT * from inventory WHERE uID = ? AND used = 1 AND availableInCloset = 1";
         var sql3 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND cType = 1 AND availableInCloset = 1"
@@ -532,7 +536,7 @@ app.post('/dashboard', async function (req, res) {
             var result4 = await query(sql4, uID);
             var result5 = await query(sql5, uID);
             var result6 = await query(sql6, uID);
-            users[i] = { 'username': username, 'uID': uID, 'Washed cloths': result1.length, 'Unwashed cloths': result2.length, 'Top wear': result3.length, 'Bottom wear': result4.length, 'Sports wear': result5.length, 'Night wear': result6.length };
+            users[i] = { 'username': username, 'uID': uID, 'age': age, 'gender': gender, 'Washed cloths': result1.length, 'Unwashed cloths': result2.length, 'Top wear': result3.length, 'Bottom wear': result4.length, 'Sports wear': result5.length, 'Night wear': result6.length };
 
         } finally { }
     }
@@ -542,6 +546,7 @@ app.post('/dashboard', async function (req, res) {
     var w = new weather('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSOR', 'Windsor', 42.314938, -83.036362);
     //var weatherDetails = await w.getWeatherForecast();
     const weatherDetails = {
+        'city': 'windsor',
         'Min. Temp.': 2.8,
         'Max. Temp.': 6.1,
         'Min. feels like': 0.6,
@@ -636,37 +641,78 @@ app.post('/suggestClothes', async function (req, res) {
         return;
     }
     var deviceID = req.body['deviceID'];
-    var uID = req.body['uID'];
-    //formal event
+    var code = req.body['code'];
     const query = util.promisify(con.query).bind(con);
-    sql = "SELECT * from user_profile WHERE uID = ? AND deviceID = ?"
-    try {
-        var result = await query(sql, [uID, deviceID]);
-    } finally { }
-    if (result.length == 0) {
-        res.status(403).send('Pass valid User ID and device ID')
-    }
-    cType = 1
-    cSubType = 3
-    sql = "SELECT * from inventory WHERE uID = ? AND deviceID = ? AND cType = ? AND cSubType = ? AND used = 0 AND availableInCloset = 1"
-    try {
-        var result = await query(sql, [uID, deviceID, cType, cSubType]);
-    } finally { }
-    if (result.length == 0) {
-        res.status(200).send('No Washed clothes available suitable for today\'s event')
-    }
-    response = []
-    for (i = 0; i < result.length; i++) {
-        temp = result[i]
-        a = { 'RFID': temp['RFID'], 'cType': temp['cType'], 'cSubType': temp['cSubType'] }
-        response.push(a)
-    }
+    const Notification = []
 
     try {
-        // const { code } = //code
-        //  const { tokens } = await oAuthClient.getToken(code);
-        //res.send(tokens)
+        const {tokens} = await oAuthClient.getToken(code);
+        oAuthClient.setCredentials({refresh_token: tokens.refresh_token})
+        const calendar = google.calendar('v3');
+        const response = await calendar.calendarList.list({
+            auth: oAuthClient
+          });
+        UserEvent = []
+        var id,uID,username;
+        for(i=0;i<response.data.items.length;i++){
+            var sql = "SELECT * FROM user_profile WHERE email = ?"
+            try{
+                result = await query(sql, response.data.items[i].id)
+            }finally{}
+            if(result.length > 0){
+                id = response.data.items[i].id;
+                uID = result[0]['uID']
+                username = result[0]['username']
+                break
+            }  
+        }
+        console.log(id)
+        const date = new Date();
+        const eDate = new Date();
+        eDate.setDate(date.getDate() - 1);
+        date.setDate(date.getDate() + 7)
+        const response1 = await calendar.events.list({
+            auth: oAuthClient,
+            calendarId: id ,
+            timeMin: eDate.toISOString(),
+            timeMax: date.toISOString()
+        })
+        events = {'Meeting': 0,'Party':0, 'Gym':0,'Social':0}
+        for(i=0;i<response1.data.items.length;i++){
+            events[response1.data.items[i].summary] +=1
+        }
+        
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 1 AND cSubType = 3"
+        var result = await query(sql, uID)
+        console.log(result)
+        if(result.length < events['Meeting']){
+            Notification.push({"title":"Meeting clothing Suggestion","Body": username + " has not enough formal shirts to wear for each meetings"})
+        }
 
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 2 AND cSubType = 3"
+        var result = await query(sql, uID)
+        if(result.length < events['Meeting']){
+            Notification.push({"title":"Meeting clothing Suggestion","Body": username + " has not enough formal trousers to wear for each meetings"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 1 AND cSubType = 6"
+        var result = await query(sql, uID)
+        if(result.length < events['Party']){
+            Notification.push({"title":"Party clothing Suggestion","Body": username + " has not enough blazers to wear for upcoming parties"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 4 AND cSubType = 1"
+        var result = await query(sql, uID)
+        if(result.length < events['Gym']){
+            Notification.push({"title":"Gym clothing Suggestion","Body": username + " has not enough sport T-shirts to wear to Gym"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 1 AND cSubType = 2"
+        var result = await query(sql, uID)
+        if(result.length < events['Social']){
+            Notification.push({"title":"Social event clothing Suggestion","Body": username + " has not enough casual clothes to wear for upcoming social events"})
+        }
+        res.send(Notification);
     } finally { }
 
 })
