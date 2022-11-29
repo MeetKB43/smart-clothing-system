@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
-import { CircularProgress, Box, Grid, Button, Card, Typography } from '@mui/material';
+import { CircularProgress, Box, Grid, Button, Card, Typography, lighten } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import { ArrowRightAltOutlined } from '@mui/icons-material';
+import { useHistory } from 'react-router-dom';
 import { PrivateWrapper } from '../components/layouts';
 import useToastr from '../hooks/useToastr';
 import Notifications from '../components/home/Suggestions';
-import { USER_ACTIONS } from '../configs';
+import { RoutePaths, USER_ACTIONS } from '../configs';
 import ActionButton from '../components/home/ActionButton';
 import { getOverview } from '../api/Clothes';
 import { createGoogleTokens } from '../api/Auth';
@@ -16,6 +18,7 @@ const DEVICE_ID = new uuid.DeviceUUID().get();
 
 const Home = () => {
   const pageName = 'Home';
+  const history = useHistory();
   const { showSuccessToastr, showErrorToastr } = useToastr();
 
   const [suggestions, setSuggestions] = useState([]);
@@ -79,23 +82,32 @@ const Home = () => {
         <Grid item xs={12} md={8}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
-              <Card elevation={8} sx={{ p: 3 }}>
+              <Card
+                elevation={8}
+                sx={{ p: 3, backgroundColor: (theme) => lighten(theme.palette.primary.main, 0.8) }}
+              >
                 <Typography variant="h4">Welcome</Typography>
                 <Grid container spacing={3}>
                   <Grid item spacing={3} xs={6}>
                     <Box sx={{ py: 3 }}>
-                      <Typography variant="h5" color="GrayText">
-                        {weatherData['Min. feels like']}&#8451;
-                      </Typography>
+                      <Typography variant="h5">{weatherData['Min. feels like']}&#8451;</Typography>
                       <Box display="flex" sx={{ pt: 2 }} flexDirection="row" alignItems="center">
                         <Typography variant="h6">{weatherData.city || 'Windsor'}</Typography>
                         <LocationOnIcon />
                       </Box>
-                      <Typography variant="body2" sx={{ pt: 2 }}>
+                      <Typography variant="subtitle1" sx={{ pt: 2 }}>
                         {weatherData['Max. Temp.']} &#8451; / {weatherData['Min. Temp.']} &#8451;
                         Feels like {weatherData['Min. feels like']}
                       </Typography>
                     </Box>
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      endIcon={<ArrowRightAltOutlined />}
+                      onClick={() => history.push(RoutePaths.INVENTORY)}
+                    >
+                      Go to Inventory
+                    </Button>
                   </Grid>
                   <Grid item spacing={3} xs={6}>
                     <Grid item xs={6} sx={{ display: { xs: 'none', sm: 'none', lg: 'block' } }}>

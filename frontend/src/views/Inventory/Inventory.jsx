@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
-import { CircularProgress, Box, Grid } from '@mui/material';
+import { CircularProgress, Box, Grid, Typography, lighten } from '@mui/material';
+import WarningIcon from '@mui/icons-material/Warning';
 import { PrivateWrapper } from '../../components/layouts';
 import useToastr from '../../hooks/useToastr';
 import { RoutePaths } from '../../configs';
@@ -38,6 +39,33 @@ const InventoryStats = () => {
       <PrivateWrapper pageName={pageName}>
         <Box p={5} display="flex" height="90vh" alignItems="center" justifyContent="center">
           {dataLoadError || <CircularProgress size={25} />}
+        </Box>
+      </PrivateWrapper>
+    );
+  }
+
+  if (dataLoaded && rows.length === 0) {
+    return (
+      <PrivateWrapper pageName={pageName}>
+        <Box p={5} display="flex" height="90vh" alignItems="center" justifyContent="center">
+          <Box
+            display="flex"
+            sx={{
+              p: 4,
+              backgroundColor: (theme) => lighten(theme.palette.error.main, 0.8),
+              color: (theme) => theme.palette.error.main,
+            }}
+            flexDirection="column"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <WarningIcon fontSize="large" />
+            <Typography variant="h5">Whoops!</Typography>
+            <Typography variant="body">
+              It seems like no users has been added into the system. Please create user profile to
+              manage their inventories.
+            </Typography>
+          </Box>
         </Box>
       </PrivateWrapper>
     );
