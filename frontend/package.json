@@ -19,6 +19,7 @@
     "lodash-es": "^4.17.21",
     "prop-types": "^15.8.1",
     "react": "^17.0.2",
+    "react-apexcharts": "^1.4.0",
     "react-dom": "^17.0.2",
     "react-google-login": "^5.2.2",
     "react-hook-form": "^7.9.0",
