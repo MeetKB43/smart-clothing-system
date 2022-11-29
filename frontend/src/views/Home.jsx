@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import * as uuid from 'device-uuid';
-import { CircularProgress, Box, Grid, Button } from '@mui/material';
+import { CircularProgress, Box, Grid, Button, Card, Typography } from '@mui/material';
 import { useGoogleLogin } from '@react-oauth/google';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { PrivateWrapper } from '../components/layouts';
 import useToastr from '../hooks/useToastr';
 import Notifications from '../components/home/Suggestions';
-import { RoutePaths, USER_ACTIONS } from '../configs';
-import InventoryInfoCard from '../components/inventory/InventoryInfoCard';
+import { USER_ACTIONS } from '../configs';
 import ActionButton from '../components/home/ActionButton';
 import { getOverview } from '../api/Clothes';
 import { createGoogleTokens } from '../api/Auth';
+import bannerImage from '../assets/images/welcome-banner.svg';
 
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
@@ -17,8 +18,9 @@ const Home = () => {
   const pageName = 'Home';
   const { showSuccessToastr, showErrorToastr } = useToastr();
 
-  const [deviceUsers, setDeviceUsers] = useState([]);
   const [suggestions, setSuggestions] = useState([]);
+
+  const [weatherData, setWeatherData] = useState({});
   const [suggestionsLoaded, setSuggestionsLoaded] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataLoadError, setDataLoadError] = useState('');
@@ -49,13 +51,12 @@ const Home = () => {
     setDataLoadError('');
     getOverview(DEVICE_ID)
       .then((data) => {
-        setDeviceUsers(data?.userOverview || []);
+        setWeatherData(data?.WeatherDetails);
         setSuggestions(data?.Notification || []);
         setDataLoaded(true);
         setSuggestionsLoaded(true);
       })
       .catch(({ response }) => {
-        setDeviceUsers([]);
         setDataLoadError(response?.data || 'Something went wrong.');
         showErrorToastr('Error fetching data. Please refresh the page.');
         setDataLoaded(true);
@@ -77,18 +78,33 @@ const Home = () => {
       <Grid container sx={{ mt: 2 }} spacing={3}>
         <Grid item xs={12} md={8}>
           <Grid container spacing={3}>
-            {deviceUsers.map((r) => (
-              <Grid key={r.username} item xs={12} md={6}>
-                <InventoryInfoCard
-                  heading={r.username}
-                  gender={r?.gender || ''}
-                  totalClothes={r['Unwashed cloths'] + r['Washed cloths'] || '0'}
-                  washedClothes={r['Washed cloths'] || '0'}
-                  unwashedClothes={r['Unwashed cloths'] || '0'}
-                  link={RoutePaths.USER_INVENTORY.replace(':uID', r.uID)}
-                />
-              </Grid>
-            ))}
+            <Grid item xs={12}>
+              <Card elevation={8} sx={{ p: 3 }}>
+                <Typography variant="h4">Welcome</Typography>
+                <Grid container spacing={3}>
+                  <Grid item spacing={3} xs={6}>
+                    <Box sx={{ py: 3 }}>
+                      <Typography variant="h5" color="GrayText">
+                        {weatherData['Min. feels like']}&#8451;
+                      </Typography>
+                      <Box display="flex" sx={{ pt: 2 }} flexDirection="row" alignItems="center">
+                        <Typography variant="h6">{weatherData.city || 'Windsor'}</Typography>
+                        <LocationOnIcon />
+                      </Box>
+                      <Typography variant="body2" sx={{ pt: 2 }}>
+                        {weatherData['Max. Temp.']} &#8451; / {weatherData['Min. Temp.']} &#8451;
+                        Feels like {weatherData['Min. feels like']}
+                      </Typography>
+                    </Box>
+                  </Grid>
+                  <Grid item spacing={3} xs={6}>
+                    <Grid item xs={6} sx={{ display: { xs: 'none', sm: 'none', lg: 'block' } }}>
+                      <img src={bannerImage} alt="banner_image" />
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Card>
+            </Grid>
           </Grid>
           <Grid container spacing={3} sx={{ mt: 1 }}>
             <Grid item xs={12}>
