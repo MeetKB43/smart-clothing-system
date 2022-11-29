@@ -18,6 +18,7 @@ var accuweather = require('node-accuweather')()('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSO
 const request = require('request');
 dotenv.config();
 const { google } = require('googleapis');
+const { query } = require('express');
 
 const oAuthClient = new google.auth.OAuth2('961222424943-474t0e2iijh1i730cqis7m9sv2639rki.apps.googleusercontent.com', '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', 'http://localhost:4000')
 
@@ -525,6 +526,7 @@ app.post('/dashboard', async function (req, res) {
     var w = new weather('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSOR', 'Windsor', 42.314938, -83.036362);
     //var weatherDetails = await w.getWeatherForecast();
     const weatherDetails = {
+        'city': 'windsor',
         'Min. Temp.': 2.8,
         'Max. Temp.': 6.1,
         'Min. feels like': 0.6,
@@ -620,31 +622,8 @@ app.post('/suggestClothes', async function (req, res) {
     }
     var deviceID = req.body['deviceID'];
     var code = req.body['code'];
-    /*var uID = req.body['uID'];
-    //formal event
     const query = util.promisify(con.query).bind(con);
-    sql = "SELECT * from user_profile WHERE uID = ? AND deviceID = ?"
-    try {
-        var result = await query(sql, [uID, deviceID]);
-    } finally { }
-    if (result.length == 0) {
-        res.status(403).send('Pass valid User ID and device ID')
-    }
-    cType = 1
-    cSubType = 3
-    sql = "SELECT * from inventory WHERE uID = ? AND deviceID = ? AND cType = ? AND cSubType = ? AND used = 0 AND availableInCloset = 1"
-    try {
-        var result = await query(sql, [uID, deviceID, cType, cSubType]);
-    } finally { }
-    if (result.length == 0) {
-        res.status(200).send('No Washed clothes available suitable for today\'s event')
-    }
-    response = []
-    for (i = 0; i < result.length; i++) {
-        temp = result[i]
-        a = { 'RFID': temp['RFID'], 'cType': temp['cType'], 'cSubType': temp['cSubType'] }
-        response.push(a)
-    }*/
+    const Notification = []
 
     try {
         const {tokens} = await oAuthClient.getToken(code);
@@ -653,7 +632,67 @@ app.post('/suggestClothes', async function (req, res) {
         const response = await calendar.calendarList.list({
             auth: oAuthClient
           });
-        console.log(response.data)
+        UserEvent = []
+        var id,uID,username;
+        for(i=0;i<response.data.items.length;i++){
+            var sql = "SELECT * FROM user_profile WHERE email = ?"
+            try{
+                result = await query(sql, response.data.items[i].id)
+            }finally{}
+            if(result.length > 0){
+                id = response.data.items[i].id;
+                uID = result[0]['uID']
+                username = result[0]['username']
+                break
+            }  
+        }
+        console.log(id)
+        const date = new Date();
+        const eDate = new Date();
+        eDate.setDate(date.getDate() - 1);
+        date.setDate(date.getDate() + 7)
+        const response1 = await calendar.events.list({
+            auth: oAuthClient,
+            calendarId: id ,
+            timeMin: eDate.toISOString(),
+            timeMax: date.toISOString()
+        })
+        events = {'Meeting': 0,'Party':0, 'Gym':0,'Social':0}
+        for(i=0;i<response1.data.items.length;i++){
+            events[response1.data.items[i].summary] +=1
+        }
+        
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 1 AND cSubType = 3"
+        var result = await query(sql, uID)
+        console.log(result)
+        if(result.length < events['Meeting']){
+            Notification.push({"title":"Meeting clothing Suggestion","Body": username + " has not enough formal shirts to wear for each meetings"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 2 AND cSubType = 3"
+        var result = await query(sql, uID)
+        if(result.length < events['Meeting']){
+            Notification.push({"title":"Meeting clothing Suggestion","Body": username + " has not enough formal trousers to wear for each meetings"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 1 AND cSubType = 6"
+        var result = await query(sql, uID)
+        if(result.length < events['Party']){
+            Notification.push({"title":"Party clothing Suggestion","Body": username + " has not enough blazers to wear for upcoming parties"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 4 AND cSubType = 1"
+        var result = await query(sql, uID)
+        if(result.length < events['Gym']){
+            Notification.push({"title":"Gym clothing Suggestion","Body": username + " has not enough sport T-shirts to wear to Gym"})
+        }
+
+        var sql = "SELECT * FROM inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1 AND cType = 1 AND cSubType = 2"
+        var result = await query(sql, uID)
+        if(result.length < events['Social']){
+            Notification.push({"title":"Social event clothing Suggestion","Body": username + " has not enough casual clothes to wear for upcoming social events"})
+        }
+        res.send(Notification);
     } finally { }
 
 })
