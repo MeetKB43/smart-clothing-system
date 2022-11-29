@@ -18,8 +18,8 @@ var accuweather = require('node-accuweather')()('jgS2xPHZDJfQ9rz4fE6skA8xJdq8qSO
 const request = require('request');
 dotenv.config();
 const { google } = require('googleapis');
-const calendar = google.calendar('v3');
-const oAuthClient = new google.auth.OAuth2('882011300173-fnt3kjgm3o32j0ukj76bqq1lcs4amueo.apps.googleusercontent.com', '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')
+
+const oAuthClient = new google.auth.OAuth2('961222424943-474t0e2iijh1i730cqis7m9sv2639rki.apps.googleusercontent.com', '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', 'http://localhost:4000')
 
 var con = mysql.createConnection({
     host: process.env.DB_HOST,
@@ -268,7 +268,8 @@ app.post('/register_user', function (req, res) {
     var lastname = body['lastname'];
     var age = body['age'];
     var gender = body['gender'];
-    var data = [null, deviceID, username, firstname, lastname, gender, age];
+    var email = body['email'];
+    var data = [null, deviceID, username, firstname, lastname, gender, age, email];
 
     sql = "SELECT * FROM user_profile WHERE username = ?"
     con.query(sql, username, function (err, result) {
@@ -277,7 +278,7 @@ app.post('/register_user', function (req, res) {
             res.status(403).send("User already exist");
         }
         else {
-            sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?)";
+            sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
             con.query(sql, data, function (err, result) {
                 if (err) throw err;
                 res.status(200).send("A new user linked with this device");
@@ -498,6 +499,8 @@ app.post('/dashboard', async function (req, res) {
     for (i = 0; i < result.length; i++) {
         var username = result[i]['username']
         var uID = result[i]['uID']
+        var age = result[i]['age']
+        var gender = result[i]['gender']
         var sql1 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND availableInCloset = 1";
         var sql2 = "SELECT * from inventory WHERE uID = ? AND used = 1 AND availableInCloset = 1";
         var sql3 = "SELECT * from inventory WHERE uID = ? AND used = 0 AND cType = 1 AND availableInCloset = 1"
@@ -512,7 +515,7 @@ app.post('/dashboard', async function (req, res) {
             var result4 = await query(sql4, uID);
             var result5 = await query(sql5, uID);
             var result6 = await query(sql6, uID);
-            users[i] = { 'username': username, 'uID': uID, 'Washed cloths': result1.length, 'Unwashed cloths': result2.length, 'Top wear': result3.length, 'Bottom wear': result4.length, 'Sports wear': result5.length, 'Night wear': result6.length };
+            users[i] = { 'username': username, 'uID': uID, 'age': age, 'gender': gender, 'Washed cloths': result1.length, 'Unwashed cloths': result2.length, 'Top wear': result3.length, 'Bottom wear': result4.length, 'Sports wear': result5.length, 'Night wear': result6.length };
 
         } finally { }
     }
@@ -616,7 +619,8 @@ app.post('/suggestClothes', async function (req, res) {
         return;
     }
     var deviceID = req.body['deviceID'];
-    var uID = req.body['uID'];
+    var code = req.body['code'];
+    /*var uID = req.body['uID'];
     //formal event
     const query = util.promisify(con.query).bind(con);
     sql = "SELECT * from user_profile WHERE uID = ? AND deviceID = ?"
@@ -640,13 +644,16 @@ app.post('/suggestClothes', async function (req, res) {
         temp = result[i]
         a = { 'RFID': temp['RFID'], 'cType': temp['cType'], 'cSubType': temp['cSubType'] }
         response.push(a)
-    }
+    }*/
 
     try {
-        // const { code } = //code
-        //  const { tokens } = await oAuthClient.getToken(code);
-        //res.send(tokens)
-
+        const {tokens} = await oAuthClient.getToken(code);
+        oAuthClient.setCredentials({refresh_token: tokens.refresh_token})
+        const calendar = google.calendar('v3');
+        const response = await calendar.calendarList.list({
+            auth: oAuthClient
+          });
+        console.log(response.data)
     } finally { }
 
 })
