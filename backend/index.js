@@ -486,7 +486,7 @@ app.post("/display_inventory", async function (req, res) {
   // Here we compute the LIMIT parameter for MySQL query
   var limit = skip + "," + numPerPage;
 
-  query("SELECT count(*) as RFID FROM inventory WHERE uID = " + uID)
+  query("SELECT count(*) as RFID FROM inventory WHERE uID = " + uID+" AND availableInCloset = 1 AND used = 0")
     .then(function (results) {
       numRows = results[0]["RFID"];
       numPages = Math.ceil(numRows / numPerPage);
