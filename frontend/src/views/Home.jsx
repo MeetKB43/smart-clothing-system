@@ -29,7 +29,7 @@ const Home = () => {
   const login = useGoogleLogin({
     onSuccess: async ({ code }) => {
       try {
-        await createGoogleTokens(code);
+        await createGoogleTokens(code, DEVICE_ID);
         window.localStorage.setItem('isCalendarAccessGranted', true);
         setIsCalendarAccessGranted(true);
         showSuccessToastr('Calendar access allowed successfully.');

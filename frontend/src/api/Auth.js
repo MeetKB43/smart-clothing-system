@@ -34,5 +34,7 @@ export const logoutDevice = async () => {
   return result.data;
 };
 
-// eslint-disable-next-line no-unused-vars
-export const createGoogleTokens = async (code) => {};
+export const createGoogleTokens = async (code, deviceID) => {
+  const result = await postApiCall('/suggestClothes', { code, deviceID });
+  return result.data;
+};
