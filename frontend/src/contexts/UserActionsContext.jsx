@@ -55,6 +55,7 @@ export const UserActionsProvider = ({ children }) => {
       if (d?.pkt_Type === RFID_PACKET_TYPE.TAKE_CLOTH) {
         // incase of multiple clothes taken from the closet, show appropiate number of clothes till 1min
         showSuccessToastr('Cloth has been taken from the closet.');
+        window.location.assign(RoutePaths.INVENTORY);
       }
 
       if (d?.pkt_Type === RFID_PACKET_TYPE.PUT_CLOTH) {
