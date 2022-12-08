@@ -346,7 +346,7 @@ app.post("/register_user", function (req, res) {
     if (result.length > 0) {
       res.status(403).send("User already exist");
     } else {
-      sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?)";
+      sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
       con.query(sql, data, function (err, result) {
         if (err) throw err;
         res.status(200).send("A new user linked with this device");

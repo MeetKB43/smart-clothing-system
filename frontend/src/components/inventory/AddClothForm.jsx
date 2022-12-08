@@ -21,6 +21,7 @@ import { getProfilesList } from '../../api/Profile';
 import { addNewCloth } from '../../api/Clothes';
 import useToastr from '../../hooks/useToastr';
 import { ClothCategories, RFID_PACKET_TYPE } from '../../configs';
+import useUserActions from '../../hooks/useUserActions';
 
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
@@ -133,7 +134,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
   };
 
   const { showErrorToastr } = useToastr();
-
+  const { setCurrentSocket, setChangeSocket, changeSocket } = useUserActions();
   const [activeStep, setActiveStep] = useState(STEPS.CATEGORY_SELECTION);
   const [processing, setProcessing] = useState(false);
 
@@ -145,36 +146,6 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
     const arr = ClothCategories.filter((c) => c.id === selectedCategory)[0]?.subCategories;
     setSubCategories(arr);
   }, [selectedCategory]);
-
-  // eslint-disable-next-line no-unused-vars
-  function getStepContent(step) {
-    switch (step) {
-      // case 0:
-      //   return <ProfileSelection setActiveStep={setActiveStep} />;
-      case STEPS.CATEGORY_SELECTION:
-        return (
-          <ClothDataSelection
-            setActiveStep={setActiveStep}
-            setSelectedData={setSelectedCategory}
-            dataList={ClothCategories || []}
-          />
-        );
-      case STEPS.SUB_CAT_SELECTION:
-        return (
-          <ClothDataSelection
-            setActiveStep={setActiveStep}
-            setSelectedData={setSelectedSubCategory}
-            dataList={subCategories || []}
-          />
-        );
-      case STEPS.ATTACH_TAG:
-        return <AttachTag />;
-      case STEPS.FINAL_MSG:
-        return <FinalStep processing={processing} />;
-      default:
-        return <Typography variant="h6">Something went wrong.</Typography>;
-    }
-  }
 
   // const labels = ['Select Profile', 'Select Cloth Category', 'Attach RFID', 'Done'];
   const labels = ['Select Cloth Category', 'Select Cloth Sub Category', 'Attach RFID', 'Done'];
@@ -204,9 +175,10 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
     const socket = socketIOClient(ENDPOINT);
     socket.on('connect', () => {
       socket.emit('connected', DEVICE_ID);
+      setCurrentSocket('form-level');
     });
 
-    socket.on('disconnect', () => { });
+    socket.on('disconnect', () => {});
 
     socket.on('RFID scanned', async (d) => {
       if (d?.pkt_Type === RFID_PACKET_TYPE.ADD_NEW_CLOTH) {
@@ -218,6 +190,7 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
+      setCurrentSocket('');
     };
   }, [selectedSubCategory]);
 
@@ -286,7 +259,14 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
               {processing ? 'Processing' : 'Back'}
             </Button>
           ))}
-        <Button onClick={closeDialog} variant="contained" color="secondary">
+        <Button
+          onClick={() => {
+            closeDialog();
+            setChangeSocket(!changeSocket);
+          }}
+          variant="contained"
+          color="secondary"
+        >
           Close
         </Button>
       </DialogActions>

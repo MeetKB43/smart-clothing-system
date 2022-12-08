@@ -29,7 +29,7 @@ const InventoryStats = () => {
         showErrorToastr('Error fetching data. Please refresh the page.');
         setDataLoaded(true);
       });
-  }, [rows, setDataLoaded]);
+  }, [rows]);
 
   if (!dataLoaded) {
     return (

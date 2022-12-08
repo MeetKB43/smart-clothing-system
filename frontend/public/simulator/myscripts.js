@@ -87,7 +87,6 @@ const Position = {
 let currX = 0;
 let currY = 0;
 function onMouseDown(e) {
-  console.log('mouse Down');
   let x = e.clientX * window.devicePixelRatio - playAreaLeft;
   let y = e.clientY * window.devicePixelRatio - playAreaTop;
 
@@ -129,7 +128,6 @@ const sendRequest = async (rfid) => {
     const response = await axios(options);
     return response;
   } catch (e) {
-    console.log(e);
     return '';
   }
 };
@@ -143,7 +141,6 @@ function onMouseMove(e) {
   currX = e.clientX * window.devicePixelRatio;
   currY = e.clientY * window.devicePixelRatio;
 
-  console.log('mouse Move');
   let newLeft = currentEle.ele.offsetLeft + difX;
   let newTop = currentEle.ele.offsetTop + difY;
 
@@ -190,7 +187,6 @@ function onMouseUp(e) {
   currX = e.clientX * window.devicePixelRatio;
   currY = e.clientY * window.devicePixelRatio;
 
-  console.log('mouse Move');
   let newLeft = currentEle.ele.offsetLeft + difX;
   let newTop = currentEle.ele.offsetTop + difY;
   if (newLeft < 700 && newTop < 700) {

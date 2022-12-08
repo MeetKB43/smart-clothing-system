@@ -20,13 +20,19 @@ const DEVICE_ID = new uuid.DeviceUUID().get();
 
 export const UserActionsContext = React.createContext({
   // eslint-disable-next-line prettier/prettier
-  showUserActionDialog: () => { },
+  showUserActionDialog: () => {},
   // eslint-disable-next-line prettier/prettier
-  closeDialog: () => { },
+  closeDialog: () => {},
+  setCurrentSocket: () => {},
+  currentSocket: () => {},
+  changeSocket: () => {},
+  setChangeSocket: () => {},
 });
 
 export const UserActionsProvider = ({ children }) => {
   const { showSuccessToastr, showErrorToastr } = useToastr();
+  const [currentSocket, setCurrentSocket] = useState('');
+  const [changeSocket, setChangeSocket] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [action, setAction] = useState(USER_ACTIONS.NA_ACTION_DETECTED);
 
@@ -34,6 +40,7 @@ export const UserActionsProvider = ({ children }) => {
   const [openManageLaundryStateDialog, setOpenManageLaundryStateDialog] = useState(false);
 
   const closeDialog = () => {
+    setAction(USER_ACTIONS.NA_ACTION_DETECTED);
     setDetectedClothes([]);
     setIsOpen(false);
   };
@@ -49,15 +56,13 @@ export const UserActionsProvider = ({ children }) => {
     const socket = socketIOClient(ENDPOINT);
 
     socket.on('connect', () => {
-      console.log("1234 Soccket connected");
       socket.emit('connected', DEVICE_ID);
+      setCurrentSocket('global-level');
     });
     // eslint-disable-next-line prettier/prettier
-    socket.on('disconnect', () => { });
+    socket.on('disconnect', () => {});
 
     socket.on('RFID scanned', async (d) => {
-      console.log("RFID Scanneeeeddddd", d);
-
       if (d?.pkt_Type === RFID_PACKET_TYPE.TAKE_CLOTH) {
         // incase of multiple clothes taken from the closet, show appropiate number of clothes till 1min
         showSuccessToastr('Cloth has been taken from the closet.');
@@ -91,8 +96,9 @@ export const UserActionsProvider = ({ children }) => {
       socket.off('connect');
       socket.off('disconnect');
       socket.off('pong');
+      setCurrentSocket('');
     };
-  }, [detectedClothes, action, isOpen]);
+  }, [detectedClothes, action, isOpen, changeSocket]);
 
   const submitWashedClothInfo = async () => {
     try {
@@ -104,8 +110,9 @@ export const UserActionsProvider = ({ children }) => {
     } catch ({ response }) {
       showErrorToastr(
         response?.message ||
-        // eslint-disable-next-line prettier/prettier
-        response?.toString() || 'Error saving clothes information. Please scan again and confirm.'
+          // eslint-disable-next-line prettier/prettier
+          response?.toString() ||
+          'Error saving clothes information. Please scan again and confirm.'
       );
       // window.location.assign(RoutePaths.INVENTORY);
     }
@@ -117,6 +124,10 @@ export const UserActionsProvider = ({ children }) => {
         value={{
           closeDialog,
           showUserActionDialog,
+          setCurrentSocket,
+          currentSocket,
+          setChangeSocket,
+          changeSocket,
         }}
       >
         {children}
