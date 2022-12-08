@@ -18,7 +18,6 @@ const InventoryStats = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
 
   useEffect(() => {
-    setDataLoaded(false);
     setDataLoadError('');
     getOverview(DEVICE_ID)
       .then((data) => {
@@ -26,12 +25,11 @@ const InventoryStats = () => {
         setDataLoaded(true);
       })
       .catch(({ response }) => {
-        setRows([]);
         setDataLoadError(response?.data || 'Something went wrong.');
         showErrorToastr('Error fetching data. Please refresh the page.');
         setDataLoaded(true);
       });
-  }, []);
+  }, [rows, setDataLoaded]);
 
   if (!dataLoaded) {
     return (

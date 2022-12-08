@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-plusplus */
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
@@ -16,7 +17,7 @@ import Slide from '@mui/material/Slide';
 import CheckBox from '@mui/material/CheckBox';
 import { saveClothesInfo } from '../../api/Clothes';
 import useToastr from '../../hooks/useToastr';
-import { RoutePaths } from '../../configs';
+// import { RoutePaths } from '../../configs';
 
 const Transition = React.forwardRef((props, ref) => <Slide direction="up" ref={ref} {...props} />);
 
@@ -81,14 +82,15 @@ const ManageLaundryState = ({ closeDialog, open, detectedClothes, onConfirm }) =
       onConfirm();
       setFinalClothData([]);
       closeDialog();
-      window.location.assign(RoutePaths.INVENTORY);
+      // window.location.assign(RoutePaths.INVENTORY);
     } catch ({ response }) {
       setFinalClothData([]);
-      window.location.assign(RoutePaths.INVENTORY);
+      // window.location.assign(RoutePaths.INVENTORY);
       showErrorToastr(
         response?.message ||
-          response?.toString() ||
-          'Error saving clothes information. Please scan again and confirm.'
+        // eslint-disable-next-line prettier/prettier
+        response?.toString() ||
+        'Error saving clothes information. Please scan again and confirm.'
       );
     }
   };

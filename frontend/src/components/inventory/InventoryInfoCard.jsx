@@ -55,7 +55,10 @@ const InventoryInfoCard = ({
           <Chart
             options={{
               chart: { type: 'donut' },
-              labels: [`${washedClothes} - Washed Clothes`, `${unwashedClothes} - Unwased Clothes`],
+              labels: [
+                `${washedClothes} - Washed Clothes`,
+                `${unwashedClothes} - Unwashed Clothes`,
+              ],
               responsive: [
                 {
                   breakpoint: 480,

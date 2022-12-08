@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
 import Proptypes from 'prop-types';
 import * as uuid from 'device-uuid';
@@ -7,7 +8,7 @@ import {
   getSubCategoryName,
   LAUNDRY_STATE,
   RFID_PACKET_TYPE,
-  RoutePaths,
+  // RoutePaths,
   USER_ACTIONS,
 } from '../configs';
 import UserActionsDialog from '../components/inventory/UserActionsDialog';
@@ -18,8 +19,10 @@ import ManageLaundryState from '../components/inventory/ManageLaundryState';
 const DEVICE_ID = new uuid.DeviceUUID().get();
 
 export const UserActionsContext = React.createContext({
-  showUserActionDialog: () => {},
-  closeDialog: () => {},
+  // eslint-disable-next-line prettier/prettier
+  showUserActionDialog: () => { },
+  // eslint-disable-next-line prettier/prettier
+  closeDialog: () => { },
 });
 
 export const UserActionsProvider = ({ children }) => {
@@ -46,16 +49,19 @@ export const UserActionsProvider = ({ children }) => {
     const socket = socketIOClient(ENDPOINT);
 
     socket.on('connect', () => {
+      console.log("1234 Soccket connected");
       socket.emit('connected', DEVICE_ID);
     });
-
-    socket.on('disconnect', () => {});
+    // eslint-disable-next-line prettier/prettier
+    socket.on('disconnect', () => { });
 
     socket.on('RFID scanned', async (d) => {
+      console.log("RFID Scanneeeeddddd", d);
+
       if (d?.pkt_Type === RFID_PACKET_TYPE.TAKE_CLOTH) {
         // incase of multiple clothes taken from the closet, show appropiate number of clothes till 1min
         showSuccessToastr('Cloth has been taken from the closet.');
-        window.location.assign(RoutePaths.INVENTORY);
+        // window.location.assign(RoutePaths.INVENTORY);
       }
 
       if (d?.pkt_Type === RFID_PACKET_TYPE.PUT_CLOTH) {
@@ -76,7 +82,6 @@ export const UserActionsProvider = ({ children }) => {
             category: getCategoryName(d?.cType),
             subCategory: getSubCategoryName(d?.cType, d?.cSubType),
           });
-
           return arrCpy;
         });
       }
@@ -87,7 +92,7 @@ export const UserActionsProvider = ({ children }) => {
       socket.off('disconnect');
       socket.off('pong');
     };
-  }, [detectedClothes, action]);
+  }, [detectedClothes, action, isOpen]);
 
   const submitWashedClothInfo = async () => {
     try {
@@ -95,14 +100,14 @@ export const UserActionsProvider = ({ children }) => {
       showSuccessToastr('Clothes information updated successfully.');
       setDetectedClothes([]);
       closeDialog();
-      window.location.assign(RoutePaths.INVENTORY);
+      // window.location.assign(RoutePaths.INVENTORY);
     } catch ({ response }) {
       showErrorToastr(
         response?.message ||
-          response?.toString() ||
-          'Error saving clothes information. Please scan again and confirm.'
+        // eslint-disable-next-line prettier/prettier
+        response?.toString() || 'Error saving clothes information. Please scan again and confirm.'
       );
-      window.location.assign(RoutePaths.INVENTORY);
+      // window.location.assign(RoutePaths.INVENTORY);
     }
   };
 

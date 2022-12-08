@@ -346,7 +346,7 @@ app.post("/register_user", function (req, res) {
     if (result.length > 0) {
       res.status(403).send("User already exist");
     } else {
-      sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
+      sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?)";
       con.query(sql, data, function (err, result) {
         if (err) throw err;
         res.status(200).send("A new user linked with this device");
@@ -399,12 +399,21 @@ app.post("/cloth_scanned", async function (req, res) {
     result = await query(sql, [RFID, deviceID]);
   } finally {
   }
+  console.log("SQL logged");
   if (result.length > 0) {
+    console.log("result length counted", result);
     if (result[0]["availableInCloset"] == 1) {
       sql =
         "UPDATE inventory SET availableInCloset = 0 WHERE RFID = ? AND deviceID = ?";
       result2 = await query(sql, [RFID, deviceID]);
+      console.log("Take Cloth Packet created");
+
       c1 = new Scanned_Cloth("take_cloth", 2, RFID, deviceID);
+      if (!socket_devices[deviceID]) {
+        console.log("take cloth device not found");
+      } else {
+        console.log("take cloth Device found");
+      }
       io.to(socket_devices[deviceID]).emit("RFID scanned", {
         ...result[0],
         ...c1,
@@ -413,7 +422,13 @@ app.post("/cloth_scanned", async function (req, res) {
       sql =
         "UPDATE inventory SET availableInCloset = 1, used = ? WHERE RFID = ? AND deviceID = ?";
       await query(sql, [1, RFID, deviceID]);
+      console.log("Put Cloth Packet created");
       c1 = new Scanned_Cloth("put_cloth", 1, RFID, deviceID);
+      if (!socket_devices[deviceID]) {
+        console.log("device not found");
+      } else {
+        console.log("Device found");
+      }
       io.to(socket_devices[deviceID]).emit("RFID scanned", {
         ...result[0],
         ...c1,
@@ -486,7 +501,11 @@ app.post("/display_inventory", async function (req, res) {
   // Here we compute the LIMIT parameter for MySQL query
   var limit = skip + "," + numPerPage;
 
-  query("SELECT count(*) as RFID FROM inventory WHERE uID = " + uID+" AND availableInCloset = 1 AND used = 0")
+  query(
+    "SELECT count(*) as RFID FROM inventory WHERE uID = " +
+      uID +
+      " AND availableInCloset = 1 AND used = 0"
+  )
     .then(function (results) {
       numRows = results[0]["RFID"];
       numPages = Math.ceil(numRows / numPerPage);

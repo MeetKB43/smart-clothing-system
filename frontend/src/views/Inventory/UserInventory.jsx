@@ -67,7 +67,7 @@ const UserInventory = ({ match }) => {
     deleteCloth(selectedCloth)
       .then(() => {
         setShowConfirmDeleteDialog(false);
-        showSuccessToastr('Profile delted successfully.');
+        showSuccessToastr('Profile deleted successfully.');
         setReloadRows(!reloadRows);
       })
       .catch((error) => {
