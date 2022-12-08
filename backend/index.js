@@ -687,10 +687,10 @@ app.post("/dashboard", async function (req, res) {
   //var weatherDetails = await w.getWeatherForecast();
   const weatherDetails = {
     city: "windsor",
-    "Min. Temp.": 2.8,
-    "Max. Temp.": 6.1,
-    "Min. feels like": 5,
-    "Max. feels like": 7.8,
+    "Min. Temp.": -2,
+    "Max. Temp.": 4,
+    "Min. feels like": 1,
+    "Max. feels like": 3,
     Day: {
       Precipitation: false,
       "Precipitation Type": null,

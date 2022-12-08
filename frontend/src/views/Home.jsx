@@ -76,7 +76,7 @@ const Home = () => {
                       </Box>
                       <Typography variant="subtitle1" sx={{ pt: 2 }}>
                         {weatherData['Max. Temp.']} &#8451; / {weatherData['Min. Temp.']} &#8451;
-                        Feels like {weatherData['Min. feels like']}
+                        Feels like {weatherData['Min. feels like']} &#8451;
                       </Typography>
                     </Box>
                     <Button
