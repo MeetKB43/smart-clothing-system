@@ -153,6 +153,11 @@ const AddClothForm = ({ closeDialog, selectedProfile }) => {
   const addClothToSystem = (rfid) => {
     setProcessing(true);
 
+    if (!selectedCategory || !selectedSubCategory) {
+      showErrorToastr('Cloth data required to add new clothes.');
+      return;
+    }
+
     addNewCloth({
       RFID: rfid,
       uID: selectedProfile,

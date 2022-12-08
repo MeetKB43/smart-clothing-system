@@ -25,4 +25,7 @@ export const saveClothesInfo = async (clothesData) => {
   return result.data;
 };
 
-export const deleteCloth = async () => {};
+export const deleteCloth = async ({ RFID }) => {
+  const result = await postApiCall('/delete-cloth', { RFID });
+  return result.data;
+};

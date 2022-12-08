@@ -930,6 +930,28 @@ app.get("/validate-session", function (req, res) {
   }
 });
 
+app.post("/delete-cloth", function (req, res) {
+  if (!validate_session(req)) {
+    res.status(401).send("Invalid Session");
+    return;
+  }
+
+  if (!req.body.RFID) {
+    res.status(400).send("RFID Required");
+    return;
+  }
+
+  console.log(req.body.RFID);
+  
+ const  query = "DELETE from inventory WHERE RFID = ?";
+  con.query(query, [req.body.RFID], function (err, result) {
+    if (err) throw err;
+    res.status(200).json({success:true});
+  });
+});
+
+
+
 app.get("/logout", function (req, res) {
   res.cookie("session_token", "", { maxAge: 0 });
   res.json({ success: true });

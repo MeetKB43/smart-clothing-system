@@ -64,10 +64,10 @@ const UserInventory = ({ match }) => {
   }, [reloadRows]);
 
   const deleteRecord = () => {
-    deleteCloth(selectedCloth)
+    deleteCloth({ RFID: selectedCloth })
       .then(() => {
         setShowConfirmDeleteDialog(false);
-        showSuccessToastr('Profile deleted successfully.');
+        showSuccessToastr('Cloth deleted successfully.');
         setReloadRows(!reloadRows);
       })
       .catch((error) => {
