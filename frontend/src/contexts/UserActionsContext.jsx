@@ -8,7 +8,6 @@ import {
   getSubCategoryName,
   LAUNDRY_STATE,
   RFID_PACKET_TYPE,
-  // RoutePaths,
   USER_ACTIONS,
 } from '../configs';
 import UserActionsDialog from '../components/inventory/UserActionsDialog';
@@ -35,6 +34,7 @@ export const UserActionsProvider = ({ children }) => {
   const [changeSocket, setChangeSocket] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [action, setAction] = useState(USER_ACTIONS.NA_ACTION_DETECTED);
+  const [refreshStatsData, setRefreshStatsData] = useState(false);
 
   const [detectedClothes, setDetectedClothes] = useState([]);
   const [openManageLaundryStateDialog, setOpenManageLaundryStateDialog] = useState(false);
@@ -42,6 +42,7 @@ export const UserActionsProvider = ({ children }) => {
   const closeDialog = () => {
     setAction(USER_ACTIONS.NA_ACTION_DETECTED);
     setDetectedClothes([]);
+    setRefreshStatsData((ps) => !ps);
     setIsOpen(false);
   };
 
@@ -66,7 +67,7 @@ export const UserActionsProvider = ({ children }) => {
       if (d?.pkt_Type === RFID_PACKET_TYPE.TAKE_CLOTH) {
         // incase of multiple clothes taken from the closet, show appropiate number of clothes till 1min
         showSuccessToastr('Cloth has been taken from the closet.');
-        // window.location.assign(RoutePaths.INVENTORY);
+        setRefreshStatsData((ps) => !ps);
       }
 
       if (d?.pkt_Type === RFID_PACKET_TYPE.PUT_CLOTH) {
@@ -128,6 +129,7 @@ export const UserActionsProvider = ({ children }) => {
           currentSocket,
           setChangeSocket,
           changeSocket,
+          refreshStatsData,
         }}
       >
         {children}
@@ -142,10 +144,12 @@ export const UserActionsProvider = ({ children }) => {
       <ManageLaundryState
         open={openManageLaundryStateDialog}
         closeDialog={() => {
+          setRefreshStatsData((ps) => !ps);
           setOpenManageLaundryStateDialog(false);
           setDetectedClothes([]);
         }}
         onConfirm={() => {
+          setRefreshStatsData((ps) => !ps);
           setOpenManageLaundryStateDialog(false);
           setDetectedClothes([]);
         }}

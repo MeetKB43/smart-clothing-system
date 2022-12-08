@@ -3,6 +3,7 @@ import * as uuid from 'device-uuid';
 import { CircularProgress, Box, Grid, Typography } from '@mui/material';
 import { PrivateWrapper } from '../../components/layouts';
 import useToastr from '../../hooks/useToastr';
+import useUserActions from '../../hooks/useUserActions';
 import { RoutePaths } from '../../configs';
 import InventoryInfoCard from '../../components/inventory/InventoryInfoCard';
 import { getOverview } from '../../api/Clothes';
@@ -12,6 +13,7 @@ const DEVICE_ID = new uuid.DeviceUUID().get();
 const InventoryStats = () => {
   const pageName = 'Inventory Stats';
   const { showErrorToastr } = useToastr();
+  const { refreshStatsData } = useUserActions();
 
   const [rows, setRows] = useState([]);
   const [dataLoadError, setDataLoadError] = useState('');
@@ -29,7 +31,7 @@ const InventoryStats = () => {
         showErrorToastr('Error fetching data. Please refresh the page.');
         setDataLoaded(true);
       });
-  }, [rows]);
+  }, [refreshStatsData]);
 
   if (!dataLoaded) {
     return (
