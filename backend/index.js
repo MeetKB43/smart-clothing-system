@@ -346,6 +346,7 @@ app.post("/register_user", function (req, res) {
     if (result.length > 0) {
       res.status(403).send("User already exist");
     } else {
+      console.log(result);
       sql = "INSERT INTO `user_profile` VALUES (?,?,?,?,?,?,?,?)";
       con.query(sql, data, function (err, result) {
         if (err) throw err;
@@ -870,7 +871,8 @@ app.post("/suggestClothes", async function (req, res) {
       Notification.push({
         title: "Meeting clothing Suggestion",
         body:
-          username + " has not enough formal shirts to wear for each meetings",
+          username +
+          " does not have enough formal clothes to wear for upcoming meetings",
       });
     }
 
@@ -882,7 +884,7 @@ app.post("/suggestClothes", async function (req, res) {
         title: "Meeting clothing Suggestion",
         body:
           username +
-          " has not enough formal trousers to wear for each meetings",
+          " does not have enough formal clothes to wear for upcoming meetings",
       });
     }
 
@@ -892,7 +894,8 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Party"]) {
       Notification.push({
         title: "Party clothing Suggestion",
-        body: username + " has not enough blazers to wear for upcoming parties",
+        body:
+          username + " does not have enough party wears for upcoming parties",
       });
     }
 
@@ -902,7 +905,7 @@ app.post("/suggestClothes", async function (req, res) {
     if (result.length < events["Gym"]) {
       Notification.push({
         title: "Gym clothing Suggestion",
-        body: username + " has not enough sport T-shirts to wear to Gym",
+        body: username + " does not have enough gym wear for Gym",
       });
     }
 
@@ -914,7 +917,7 @@ app.post("/suggestClothes", async function (req, res) {
         title: "Social event clothing Suggestion",
         body:
           username +
-          " has not enough casual clothes to wear for upcoming social events",
+          " does not have enough casual clothes to wear for upcoming social events",
       });
     }
     res.send(Notification);
@@ -942,15 +945,13 @@ app.post("/delete-cloth", function (req, res) {
   }
 
   console.log(req.body.RFID);
-  
- const  query = "DELETE from inventory WHERE RFID = ?";
+
+  const query = "DELETE from inventory WHERE RFID = ?";
   con.query(query, [req.body.RFID], function (err, result) {
     if (err) throw err;
-    res.status(200).json({success:true});
+    res.status(200).json({ success: true });
   });
 });
-
-
 
 app.get("/logout", function (req, res) {
   res.cookie("session_token", "", { maxAge: 0 });
