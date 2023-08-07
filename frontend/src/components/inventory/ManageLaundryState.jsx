@@ -14,7 +14,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Slide from '@mui/material/Slide';
-import CheckBox from '@mui/material/CheckBox';
+import CheckBox from '@mui/material/Checkbox';
 import { saveClothesInfo } from '../../api/Clothes';
 import useToastr from '../../hooks/useToastr';
 // import { RoutePaths } from '../../configs';

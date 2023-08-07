@@ -1,39 +1,39 @@
-# The version of the docker-compose.
-version: "3.3"
-# Telling docker-compose to build the client and server images and run them in containers.
+version: '3'
 services:
   frontend:
-    # Telling docker-compose to build the client image using the Dockerfile in the client directory.
-    # image: frontend
     build:
       context: ./frontend
-      dockerfile: Dockerfile
-    # Giving the container a name.
-    # container_name: frontendapp_c
-    # Mapping the port 4000 on the host machine to the port 4000 on the container.
     ports:
-      - 4000:4000
-    # Mapping the client directory on the host machine to the /app directory on the container.
-    volumes:
-      - ./frontend:/app
-      - ./frontend/public:/app/public
-      # - ./app/node_modules
-    # Allows you to run container in detached mode.
-    stdin_open: true
-    restart: always
-    tty: true
+      - "4000:4000"
     depends_on:
       - backend
+    networks:
+      - scs-network
 
   backend:
-    restart: always
-    # Telling docker-compose to build the client image using the Dockerfile in the server directory.
-    # image: backend
     build:
       context: ./backend
-      dockerfile: Dockerfile
-    # container_name: backendapp_c
     ports:
-      - 8000:8000
+      - "8000:8000"
+    networks:
+      - scs-network
+
+  scs-mysql-db:
+    image: mysql:8.0.26
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_ROOT_PASSWORD: 
+    ports:
+      - "3306:3306"
+    networks:
+      - scs-network
     volumes:
-      - ./backend:/app
+      - scs-mysql-data:/var/lib/mysql
+
+volumes:
+  scs-mysql-data:
+    driver: local
+
+networks:
+  scs-network:
+    driver: bridge
