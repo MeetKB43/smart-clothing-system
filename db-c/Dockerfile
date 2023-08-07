@@ -1,0 +1,7 @@
+FROM mysql:8.0.26
+
+ENV MYSQL_ALLOW_EMPTY_PASSWORD=true
+
+EXPOSE 3306
+
+CMD ["mysqld"]

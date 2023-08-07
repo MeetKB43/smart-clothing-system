@@ -19,9 +19,9 @@ services:
       - scs-network
 
   scs-mysql-db:
-    image: mysql:8.0.26
+    build:
+      context: ./db-c
     environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
       MYSQL_ROOT_PASSWORD: 
     ports:
       - "3306:3306"
